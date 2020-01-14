@@ -32,21 +32,35 @@ public class Main extends Application {
     public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
     public static final Paint BACKGROUND = Color.AZURE;
-    public static final String BOUNCER_IMAGE = "ball.gif";
-    public static final String PADDLE_IMAGE = "paddle.gif";
+    public static final int WALL_FLOAT = 15;
+    public static final int WALL_WIDTH = 10;
+    public static final int PADDLE_HEIGHT = 10;
     public static final int PADDLE_SPEED = 10;
-    public static final int PADDLE_FLOAT = 30;  // paddle pixel float above bottom of screen
-    public static final double PADDLE_EDGE = Math.PI / 4;       // max paddle angular deflection off edge
+    public static final int PADDLE_FLOAT = 30;              // paddle pixel float above bottom of screen
+    public static final double PADDLE_EDGE = Math.PI / 4;   // max paddle angular deflection off edge
+    public static final Paint PADDLE_COLOR = Color.BLUEVIOLET;
+    public static final Paint BOUNCER_COLOR = Color.GOLD;
+    public static final Paint WALL_FILL = Color.BLACK;
 
     // idea to handle ball movement, set angle of motion (theta) and speed
     // these should be sufficient to handle the ball vector
+    // plus other changable global variables (e.g. paddle width)
     public static double BOUNCER_THETA = Math.PI / 2;
-    public static int BOUNCER_SPEED = 50;
+    public static int BOUNCER_NORMAL_SPEED = 240;
+    public static int BOUNCER_SPEED = BOUNCER_NORMAL_SPEED;
+    public static int BOUNCER_RADIUS = 8;
+    public static int PADDLE_WIDTH = 100;
+    public static int LIVES_LEFT = 3;
+    public static boolean BALL_STUCK = false;
 
     // some things needed to remember during game
     private Scene myScene;
-    private ImageView myBouncer;
-    private ImageView myPaddle;
+    private Circle myBouncer;
+    private Rectangle myPaddle;
+    private Rectangle myLeftWall;
+    private Rectangle myRightWall;
+    private Rectangle myTopWall;
+    private Rectangle myBrick;
 
     /**
      * Initialize what will be displayed and how it will be updated.
@@ -71,18 +85,18 @@ public class Main extends Application {
         // create one top level collection to organize the things in the scene
         Group root = new Group();
         // make some shapes and set their properties
-        Image imageBounce = new Image(this.getClass().getClassLoader().getResourceAsStream(BOUNCER_IMAGE));
-        Image imagePaddle = new Image(this.getClass().getClassLoader().getResourceAsStream(PADDLE_IMAGE));
-        myBouncer = new ImageView(imageBounce);
-        myPaddle = new ImageView(imagePaddle);
-        // x and y represent the top left corner, so center it in window
-        myBouncer.setX(width / 2 - myBouncer.getBoundsInLocal().getWidth() / 2);
-        myBouncer.setY(height / 2 - myBouncer.getBoundsInLocal().getHeight() / 2);
-        myPaddle.setX(width / 2 - myPaddle.getBoundsInLocal().getWidth() / 2);
-        myPaddle.setY(height - myPaddle.getBoundsInLocal().getHeight() / 2 - PADDLE_FLOAT);
+        createPaddle(width, height);
+        createBouncer();
+        myLeftWall = createWall(WALL_FLOAT, WALL_FLOAT, WALL_WIDTH, height - WALL_FLOAT);
+        myRightWall = createWall(width - 2 * WALL_FLOAT, WALL_FLOAT, WALL_WIDTH, height - WALL_FLOAT);
+        myTopWall = createWall(WALL_FLOAT, WALL_FLOAT, width - 3 * WALL_FLOAT, WALL_WIDTH);
 
         root.getChildren().add(myBouncer);
         root.getChildren().add(myPaddle);
+        root.getChildren().add(myLeftWall);
+        root.getChildren().add(myRightWall);
+        root.getChildren().add(myTopWall);
+
         // create a place to see the shapes
         Scene scene = new Scene(root, width, height, background);
         // respond to input
@@ -90,68 +104,126 @@ public class Main extends Application {
         return scene;
     }
 
+    private void createPaddle(int width, int height) {
+        myPaddle = new Rectangle();
+        myPaddle.setX(width / 2 - myPaddle.getBoundsInLocal().getWidth() / 2);
+        myPaddle.setY(height - myPaddle.getBoundsInLocal().getHeight() / 2 - PADDLE_FLOAT);
+        myPaddle.setWidth(PADDLE_WIDTH);
+        myPaddle.setHeight(PADDLE_HEIGHT);
+        myPaddle.setFill(PADDLE_COLOR);
+    }
+
+    private void createBouncer() {
+        myBouncer = new Circle();
+        myBouncer.setRadius(BOUNCER_RADIUS);
+        myBouncer.setFill(BOUNCER_COLOR);
+        setBallOnPaddle();
+    }
+
+    private Rectangle createWall(int x, int y, int width, int height) {
+        return new Rectangle (x, y, width, height);
+    }
+
+    private void setBallOnPaddle() {
+        myBouncer.setCenterX(myPaddle.getX() + myPaddle.getWidth() / 2);
+        myBouncer.setCenterY(myPaddle.getY() - myBouncer.getRadius());
+        BALL_STUCK = true;
+        BOUNCER_SPEED = 0;
+    }
+
+    private void releaseStuckBall() {
+        BALL_STUCK = false;
+        BOUNCER_SPEED = BOUNCER_NORMAL_SPEED;
+    }
+
     // Change properties of shapes in small ways to animate them over time
     // Note, there are more sophisticated ways to animate shapes, but these simple ways work fine to start
     private void step (double elapsedTime) {
         // update "actors" attributes
-        myBouncer.setY(myBouncer.getY() + BOUNCER_SPEED * elapsedTime * Math.sin(BOUNCER_THETA));
-        myBouncer.setX(myBouncer.getX() + BOUNCER_SPEED * elapsedTime * Math.cos(BOUNCER_THETA));
+        myBouncer.setCenterY(myBouncer.getCenterY() + BOUNCER_SPEED * elapsedTime * Math.sin(BOUNCER_THETA));
+        myBouncer.setCenterX(myBouncer.getCenterX() + BOUNCER_SPEED * elapsedTime * Math.cos(BOUNCER_THETA));
+        checkCollision();
+        checkInBounds();
+    }
 
-        // check for collisions
-        // with shapes, can check precisely
-        // NEW Java 10 syntax that simplifies things (but watch out it can make code harder to understand)
-        // var intersection = Shape.intersect(myMover, myGrower);
+    private void checkInBounds() {
+        if (myBouncer.getCenterY() > SIZE) {
+            bouncerOffScreen();
+        }
+    }
 
-        /*
-        Shape intersection = Shape.intersect(myMover, myBouncer);
-        if (intersection.getBoundsInLocal().getWidth() != -1) {
-            myMover.setFill(HIGHLIGHT);
+    private void bouncerOffScreen() {
+        LIVES_LEFT --;
+        setBallOnPaddle();
+        if (LIVES_LEFT < 1) {
+            gameOver();
         }
-        else {
-            myMover.setFill(MOVER_COLOR);
-        }
-        */
-        // with images can only check bounding box
-        if (myPaddle.getBoundsInParent().intersects(myBouncer.getBoundsInParent())) {
-            paddleDeflect();
-        }
+    }
+
+    // TODO: Populate end game
+    private void gameOver() {
 
     }
 
-    // Handle ball deflect off of paddle
-    // Maintain polar coordinates to determine new direction init og ball
-    // TODO: figure out paddle deflection angular system
-    private void paddleDeflect() {
+    // TODO: Modify collision to detection to passing general shape objects to compare inersect
+    private void checkCollision() {
+        double scale = 0; double shift = 1;
+        if (shapeCollision(myPaddle, myBouncer)) { // && ballAbovePaddle()) {
+            angleDeflect();
+            // scale = -1; shift = 0;
+        } else if (shapeCollision(myBouncer, myTopWall)) {
+            scale = -1; shift = 0;
+        } else if (shapeCollision(myBouncer, myLeftWall)){
+            scale = -1; shift = Math.PI;
+        } else if (shapeCollision(myBouncer, myRightWall)) {
+            scale = -1; shift = Math.PI;
+        }
+        if (scale != 0) {
+            basicDeflect(scale, shift);
+        }
+    }
+
+    private boolean shapeCollision(Shape s1, Shape s2) {
+        return Shape.intersect(s1, s2).getBoundsInLocal().getWidth() != -1;
+    }
+
+    private boolean ballAbovePaddle() {
+        return myBouncer.getCenterY() + myBouncer.getRadius() > myPaddle.getY();
+    }
+
+    private void basicDeflect(double scale, double shift) {
+        BOUNCER_THETA = BOUNCER_THETA * scale + shift;
+    }
+
+    private void angleDeflect() {
         double paddleX = myPaddle.getX();
-        double bouncerX = myBouncer.getX();
-        double paddleSize = myPaddle.getFitWidth();
-        double paddleCenter = paddleX - paddleSize;
-        // BOUNCER_THETA = (paddleCenter - bouncerX)/(paddleCenter - paddleX)*PADDLE_EDGE;
-        BOUNCER_THETA = BOUNCER_THETA * -1;
+        double bouncerX = myBouncer.getCenterX();
+        double paddleWidth = myPaddle.getWidth();
+        double paddleCenter = paddleX + paddleWidth / 2;
+        BOUNCER_THETA = - Math.PI / 2 + 2 * (bouncerX - paddleCenter) * (PADDLE_EDGE / paddleWidth);
     }
 
-    // What to do each time a key is pressed
+    private void sideKeyPress(int direct, Rectangle wall) {
+        if (!(shapeCollision(myPaddle, wall))) {
+            myPaddle.setX(myPaddle.getX() + direct * PADDLE_SPEED);
+            if (BALL_STUCK) {
+                myBouncer.setCenterX(myBouncer.getCenterX() + direct * PADDLE_SPEED);
+            }
+        }
+    }
+
     private void handleKeyInput (KeyCode code) {
         if (code == KeyCode.RIGHT) {
-            myPaddle.setX(myPaddle.getX() + PADDLE_SPEED);
+            sideKeyPress(1, myRightWall);
         }
         else if (code == KeyCode.LEFT) {
-            myPaddle.setX(myPaddle.getX() - PADDLE_SPEED);
+            sideKeyPress(-1, myLeftWall);
         }
-        // NEW Java 12 syntax that some prefer (but watch out for the many special cases!)
-        //   https://blog.jetbrains.com/idea/2019/02/java-12-and-intellij-idea/
-        // Note, must set Project Language Level to "13 Preview" under File -> Project Structure
-        // switch (code) {
-        //     case RIGHT -> myMover.setX(myMover.getX() + MOVER_SPEED);
-        //     case LEFT -> myMover.setX(myMover.getX() - MOVER_SPEED);
-        //     case UP -> myMover.setY(myMover.getY() - MOVER_SPEED);
-        //     case DOWN -> myMover.setY(myMover.getY() + MOVER_SPEED);
-        // }
+        if (code == KeyCode.SPACE && BALL_STUCK) {
+            releaseStuckBall();
+        }
     }
 
-    /**
-     * Start the program.
-     */
     public static void main (String[] args) {
         launch(args);
     }
