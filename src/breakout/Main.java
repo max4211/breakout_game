@@ -41,6 +41,8 @@ public class Main extends Application {
     public static final int BRICK_FLOOR_PAD = 40;
     public static final int BRICK_RIGHT_PAD = 15;
     public static final int BRICK_LEFT_PAD = 15;
+    public static final double BRICK_STROKE_WIDTH = 0.05;
+    public static final Paint BRICK_STROKE_COLOR = Color.BLACK;
 
     // Wall metadata
     public static final int WALL_FLOAT = 15;
@@ -54,7 +56,6 @@ public class Main extends Application {
     public static final double PADDLE_EDGE = Math.PI / 4;   // max paddle angular deflection off edge
     public static final Paint PADDLE_COLOR = Color.BLUEVIOLET;
     public static final Paint BOUNCER_COLOR = Color.GOLD;
-
 
     // idea to handle ball movement, set angle of motion (theta) and speed
     // these should be sufficient to handle the ball vector
@@ -143,6 +144,8 @@ public class Main extends Application {
         myBrick.setWidth(BRICK_WIDTH);
         myBrick.setHeight(BRICK_HEIGHT);
         myBrick.setFill(BRICK_COLOR);
+        myBrick.setStrokeWidth(myBrick.getWidth()*BRICK_STROKE_WIDTH);
+        myBrick.setStroke(BRICK_STROKE_COLOR);
     }
 
     private void createPaddle(int width, int height) {
@@ -206,12 +209,11 @@ public class Main extends Application {
 
     }
 
-    // TODO: Modify collision to detection to passing general shape objects to compare inersect
+    // TODO: Modify collision detection to SIDE of an object, deflect appropriately
     private void checkCollision() {
         double scale = 0; double shift = 1;
         if (shapeCollision(myPaddle, myBouncer)) { // && ballAbovePaddle()) {
             angleDeflect();
-            // scale = -1; shift = 0;
         } else if (shapeCollision(myBouncer, myTopWall)) {
             scale = -1; shift = 0;
         } else if (shapeCollision(myBouncer, myLeftWall)){
