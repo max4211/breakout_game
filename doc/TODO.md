@@ -9,3 +9,6 @@
 - Create and experiment with bricks
 - Collision detection (NVIDIA, n^2 algo efficient up to 10E6 objects)
 - Divide code up into classes
+
+#### Ideas to think about
+- Refactor items as collections (walls, balls, bricks)

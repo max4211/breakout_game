@@ -7,8 +7,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -17,7 +15,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.util.Duration;
 import java.lang.Math.*;
-
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Messing around with JFX
@@ -28,26 +27,13 @@ import java.lang.Math.*;
 public class Main extends Application {
     // Game metadata
     public static final String TITLE = "Bounce Test JavaFX";
-    public static final int SIZE = 400;
+    public static final int SCREEN_WIDTH = 400;
+    public static final int SCREEN_HEIGHT = 400;
     public static final int FRAMES_PER_SECOND = 120;
     public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
     public static final Paint BACKGROUND = Color.AZURE;
-
-    // Brick metadata
-    public static final int BRICK_ROWS = 25;
-    public static final int BRICKS_PER_ROW = 10;
-    public static final int BRICK_TOP_PAD = 25;
-    public static final int BRICK_FLOOR_PAD = 40;
-    public static final int BRICK_RIGHT_PAD = 15;
-    public static final int BRICK_LEFT_PAD = 15;
-    public static final double BRICK_STROKE_WIDTH = 0.05;
-    public static final Paint BRICK_STROKE_COLOR = Color.BLACK;
-
-    // Wall metadata
-    public static final int WALL_FLOAT = 15;
-    public static final int WALL_WIDTH = 10;
-    public static final Paint WALL_FILL = Color.BLACK;
+    public static int LIVES_LEFT = 3;
 
     // Paddle metadata
     public static final int PADDLE_HEIGHT = 10;
@@ -55,7 +41,24 @@ public class Main extends Application {
     public static final int PADDLE_FLOAT = 30;              // paddle pixel float above bottom of screen
     public static final double PADDLE_EDGE = Math.PI / 4;   // max paddle angular deflection off edge
     public static final Paint PADDLE_COLOR = Color.BLUEVIOLET;
-    public static final Paint BOUNCER_COLOR = Color.GOLD;
+    public static int PADDLE_WIDTH = 100;
+
+    // Brick metadata
+    public static final int BRICK_ROWS = 25;
+    public static final int BRICKS_PER_ROW = 10;
+    public static final double BRICK_STROKE_WIDTH = 0.05;
+    public static final Paint BRICK_STROKE_COLOR = Color.BLACK;
+
+    // TODO: implement brick padding
+    public static final int BRICK_TOP_PAD = 25;
+    public static final int BRICK_FLOOR_PAD = 40;
+    public static final int BRICK_RIGHT_PAD = 15;
+    public static final int BRICK_LEFT_PAD = 15;
+
+    // Wall metadata
+    public static final int WALL_FLOAT = 0;
+    public static final int WALL_WIDTH = 10;
+    public static final Paint WALL_FILL = Color.BLACK;
 
     // idea to handle ball movement, set angle of motion (theta) and speed
     // these should be sufficient to handle the ball vector
@@ -64,9 +67,8 @@ public class Main extends Application {
     public static int BOUNCER_NORMAL_SPEED = 240;
     public static int BOUNCER_SPEED = BOUNCER_NORMAL_SPEED;
     public static int BOUNCER_RADIUS = 8;
-    public static int PADDLE_WIDTH = 100;
-    public static int LIVES_LEFT = 3;
-    public static boolean BALL_STUCK = false;
+    public static boolean BOUNCER_STUCK = false;
+    public static final Paint BOUNCER_COLOR = Color.GOLD;
 
     // dynamic variable sizes to configure at start of game
     public static double BRICK_HEIGHT;
@@ -76,6 +78,7 @@ public class Main extends Application {
     // some things needed to remember during game
     private Scene myScene;
     private Circle myBouncer;
+    private Collection<Wall> allWalls = new ArrayList<Wall>();
     private Rectangle myPaddle;
     private Rectangle myLeftWall;
     private Rectangle myRightWall;
@@ -88,7 +91,7 @@ public class Main extends Application {
     @Override
     public void start (Stage stage) {
         // attach scene to the stage and display it
-        myScene = setupGame(SIZE, SIZE, BACKGROUND);
+        myScene = setupGame();
         stage.setScene(myScene);
         stage.setTitle(TITLE);
         stage.show();
@@ -101,16 +104,15 @@ public class Main extends Application {
     }
 
     // Create the game's "scene": what shapes will be in the game and their starting properties
-    private Scene setupGame (int width, int height, Paint background) {
+    private Scene setupGame () {
         // create one top level collection to organize the things in the scene
         Group root = new Group();
         // make some shapes and set their properties
-        createPaddle(width, height);
+        // myPaddle = new Paddle(width, height);
+        createPaddle();
         createBouncer();
-        myLeftWall = createWall(WALL_FLOAT, WALL_FLOAT, WALL_WIDTH, height - WALL_FLOAT);
-        myRightWall = createWall(width - 2 * WALL_FLOAT, WALL_FLOAT, WALL_WIDTH, height - WALL_FLOAT);
-        myTopWall = createWall(WALL_FLOAT, WALL_FLOAT, width - 3 * WALL_FLOAT, WALL_WIDTH);
-        createBrick(width, height);
+        createAllWalls();
+        createBrick();
 
         root.getChildren().add(myBouncer);
         root.getChildren().add(myPaddle);
@@ -120,10 +122,19 @@ public class Main extends Application {
         root.getChildren().add(myBrick);
 
         // create a place to see the shapes
-        Scene scene = new Scene(root, width, height, background);
+        Scene scene = new Scene(root);
         // respond to input
         scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
         return scene;
+    }
+
+    private void createAllWalls() {
+        myLeftWall = createRectangle(WALL_FLOAT, WALL_FLOAT, WALL_WIDTH, SCREEN_HEIGHT - WALL_FLOAT);
+        myRightWall = createRectangle(SCREEN_WIDTH - 2 * WALL_FLOAT, WALL_FLOAT, WALL_WIDTH, SCREEN_HEIGHT - WALL_FLOAT);
+        myTopWall = createRectangle(WALL_FLOAT, WALL_FLOAT, SCREEN_WIDTH - 3 * WALL_FLOAT, WALL_WIDTH);
+        allWalls.add(new Wall(myLeftWall));
+        allWalls.add(new Wall(myRightWall));
+        allWalls.add(new Wall(myTopWall));
     }
 
     // TODO: Incorporate padding to decrease dimensions
@@ -136,11 +147,11 @@ public class Main extends Application {
         BRICK_HEIGHT = (bottomY - topY) / BRICK_ROWS;
     }
 
-    private void createBrick(int width, int height) {
+    private void createBrick() {
         setBrickDimensions();
         myBrick = new Rectangle();
-        myBrick.setX(width / 2 - myBrick.getBoundsInLocal().getWidth() / 2);
-        myBrick.setY(height / 2 - myBrick.getBoundsInLocal().getHeight() / 2);
+        myBrick.setX(SCREEN_WIDTH / 2 - myBrick.getBoundsInLocal().getWidth() / 2);
+        myBrick.setY(SCREEN_HEIGHT / 2 - myBrick.getBoundsInLocal().getHeight() / 2);
         myBrick.setWidth(BRICK_WIDTH);
         myBrick.setHeight(BRICK_HEIGHT);
         myBrick.setFill(BRICK_COLOR);
@@ -148,10 +159,10 @@ public class Main extends Application {
         myBrick.setStroke(BRICK_STROKE_COLOR);
     }
 
-    private void createPaddle(int width, int height) {
+    private void createPaddle() {
         myPaddle = new Rectangle();
-        myPaddle.setX(width / 2 - myPaddle.getBoundsInLocal().getWidth() / 2);
-        myPaddle.setY(height - myPaddle.getBoundsInLocal().getHeight() / 2 - PADDLE_FLOAT);
+        myPaddle.setX(SCREEN_WIDTH / 2 - myPaddle.getBoundsInLocal().getWidth() / 2);
+        myPaddle.setY(SCREEN_HEIGHT - myPaddle.getBoundsInLocal().getHeight() / 2 - PADDLE_FLOAT);
         myPaddle.setWidth(PADDLE_WIDTH);
         myPaddle.setHeight(PADDLE_HEIGHT);
         myPaddle.setFill(PADDLE_COLOR);
@@ -164,19 +175,19 @@ public class Main extends Application {
         setBallOnPaddle();
     }
 
-    private Rectangle createWall(int x, int y, int width, int height) {
+    private Rectangle createRectangle(int x, int y, int width, int height) {
         return new Rectangle (x, y, width, height);
     }
 
     private void setBallOnPaddle() {
         myBouncer.setCenterX(myPaddle.getX() + myPaddle.getWidth() / 2);
         myBouncer.setCenterY(myPaddle.getY() - myBouncer.getRadius());
-        BALL_STUCK = true;
+        BOUNCER_STUCK = true;
         BOUNCER_SPEED = 0;
     }
 
     private void releaseStuckBall() {
-        BALL_STUCK = false;
+        BOUNCER_STUCK = false;
         BOUNCER_SPEED = BOUNCER_NORMAL_SPEED;
     }
 
@@ -191,7 +202,7 @@ public class Main extends Application {
     }
 
     private void checkInBounds() {
-        if (myBouncer.getCenterY() > SIZE) {
+        if (myBouncer.getCenterY() > SCREEN_HEIGHT) {
             bouncerOffScreen();
         }
     }
@@ -212,7 +223,7 @@ public class Main extends Application {
     // TODO: Modify collision detection to SIDE of an object, deflect appropriately
     private void checkCollision() {
         double scale = 0; double shift = 1;
-        if (shapeCollision(myPaddle, myBouncer)) { // && ballAbovePaddle()) {
+        if (shapeCollision(myBouncer, myPaddle)) { // && ballAbovePaddle()) {
             angleDeflect();
         } else if (shapeCollision(myBouncer, myTopWall)) {
             scale = -1; shift = 0;
@@ -249,7 +260,7 @@ public class Main extends Application {
     private void sideKeyPress(int direct, Rectangle wall) {
         if (!(shapeCollision(myPaddle, wall))) {
             myPaddle.setX(myPaddle.getX() + direct * PADDLE_SPEED);
-            if (BALL_STUCK) {
+            if (BOUNCER_STUCK) {
                 myBouncer.setCenterX(myBouncer.getCenterX() + direct * PADDLE_SPEED);
             }
         }
@@ -262,7 +273,7 @@ public class Main extends Application {
         else if (code == KeyCode.LEFT) {
             sideKeyPress(-1, myLeftWall);
         }
-        if (code == KeyCode.SPACE && BALL_STUCK) {
+        if (code == KeyCode.SPACE && BOUNCER_STUCK) {
             releaseStuckBall();
         }
     }
