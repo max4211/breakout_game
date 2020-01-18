@@ -4,6 +4,7 @@
 #### Changes to make
 - Make global sizing variables dynamic to game screen
 - Make brick sizing dynamic for screen
+- Set root to global, get all children nodes each time and check what they are an instance of
 
 #### Next steps
 - Create and experiment with bricks

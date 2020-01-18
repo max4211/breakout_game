@@ -24,20 +24,23 @@ import java.util.Collection;
  */
 public class Game extends Application {
     // Game metadata
-    public static final String TITLE = "Bounce Test JavaFX";
+    public static final String TITLE = "Breakout Game JavaFX";
     public static final int SCREEN_WIDTH = 400;
     public static final int SCREEN_HEIGHT = 400;
-    public static final int FRAMES_PER_SECOND = 120;
-    public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
-    public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
-    public static final Paint BACKGROUND = Color.AZURE;
     public static int LIVES_LEFT = 3;
 
-    // some things needed to remember during game
+    private static final int FRAMES_PER_SECOND = 120;
+    private static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
+    private static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
+    private static final Paint BACKGROUND = Color.AZURE;
+
+
+    // some things needed to remember during the game
     private Scene myScene;
     private Paddle myPaddle;
     private Collection<Wall> allWalls = new ArrayList<Wall>();
     private Collection<Bouncer> allBouncers = new ArrayList<Bouncer>();
+    private Collection<Brick> allBricks = new ArrayList<Brick>();
 
     /**
      * Initialize what will be displayed and how it will be updated.
@@ -66,17 +69,42 @@ public class Game extends Application {
         createPaddle();
         createAllWalls();
         createBouncers();
+        createBricks();
 
         // add shapes of items to root
         root = addPaddleToRoot(root);
         root = addWallsToRoot(root);
         root = addBouncersToRoot(root);
 
-        // create a place to see the shapes
+        // create a place to see the shapes and respond to input
         Scene scene = new Scene(root);
-        // respond to input
         scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
         return scene;
+    }
+
+    private void createBricks() {
+        double[] wallBounds = getWallBounds();
+        double paddleBound = getPaddleBound();
+        
+    }
+
+    private double getPaddleBound() {
+        return myPaddle.getBoundsInLocal().getMinY();
+    }
+
+    // int: {left_bound, right_bound, top_bound}
+    private double[] getWallBounds() {
+        double[] wallBounds = new double[3];
+        for (Wall w: allWalls) {
+            if (w.getMyName().equals("LEFT")) {
+                wallBounds[0] = w.getMyWall().getBoundsInLocal().getMaxX();
+            } else if (w.getMyName().equals("RIGHT")) {
+                wallBounds[1] = w.getMyWall().getBoundsInLocal().getMinX();
+            } else if (w.getMyName().equals("TOP")) {
+                wallBounds[2] = w.getMyWall().getBoundsInLocal().getMaxY();
+            }
+        }
+        return wallBounds;
     }
 
     private void createPaddle() {
@@ -119,10 +147,14 @@ public class Game extends Application {
         // update "actors" attributes
         moveBouncers(elapsedTime);
         collisionDetection();
+        outOfBoundsDetection();
     }
 
-    // TODO: check all combinations of objects still in existence, verifying instance to determine reaction
-    // TODO: Study getInBoundsLocal to figure out redirect
+    // TODO: Implement out of bounds detection
+    private void outOfBoundsDetection() {
+
+    }
+
     private void collisionDetection() {
         double[] redirect = new double[2];
         for (Bouncer b: allBouncers) {
@@ -151,13 +183,15 @@ public class Game extends Application {
             redirect[0] = -1; redirect[1] = Math.PI;
         } else if (checkLeftCollision(r, c)) {
             redirect[0] = -1; redirect[1] = Math.PI;
-        } else {
-            ;
+        } else if (checkTopCollision(r, c)){
+            // TODO: Verify this is correct
+            redirect[0] = -1; redirect[1] = 0;
         }
         return redirect;
     }
 
-    // TODO: Implement refactored method (elastic) below
+    // TODO: Implement refactored method (elastic) below - may want to keep b/c sides add good specificity
+    // IDEA: Could refactor based on top/bottom, left right (only things that matter for polar shift
     private boolean checkElasticCollision(Rectangle r, Circle c, double xShift, double yShift) {
         return r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX() + xShift, c.getBoundsInLocal().getCenterY() + yShift);
     }
@@ -168,6 +202,10 @@ public class Game extends Application {
 
     private boolean checkLeftCollision(Rectangle r, Circle c) {
         return r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX() - c.getRadius(), c.getBoundsInLocal().getCenterY());
+    }
+
+    private boolean checkTopCollision(Rectangle r, Circle c) {
+        return r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX(), c.getBoundsInLocal().getCenterY() + c.getRadius());
     }
 
     private boolean checkBottomCollision(Rectangle r, Circle c) {
