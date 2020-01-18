@@ -60,9 +60,7 @@ public class Main extends Application {
     public static final int WALL_WIDTH = 10;
     public static final Paint WALL_FILL = Color.BLACK;
 
-    // idea to handle ball movement, set angle of motion (theta) and speed
-    // these should be sufficient to handle the ball vector
-    // plus other changable global variables (e.g. paddle width)
+    // Bouncer metadata
     public static double BOUNCER_THETA = Math.PI / 2;
     public static int BOUNCER_NORMAL_SPEED = 240;
     public static int BOUNCER_SPEED = BOUNCER_NORMAL_SPEED;
@@ -78,12 +76,15 @@ public class Main extends Application {
     // some things needed to remember during game
     private Scene myScene;
     private Circle myBouncer;
-    private Collection<Wall> allWalls = new ArrayList<Wall>();
     private Rectangle myPaddle;
     private Rectangle myLeftWall;
     private Rectangle myRightWall;
     private Rectangle myTopWall;
     private Rectangle myBrick;
+
+    private Collection<Wall> allWalls = new ArrayList<Wall>();
+    private Collection<Bouncer> allBouncers = new ArrayList<Bouncer>();
+    private Collection<Brick> allBricks = new ArrayList<Brick>();
 
     /**
      * Initialize what will be displayed and how it will be updated.
@@ -107,15 +108,20 @@ public class Main extends Application {
     private Scene setupGame () {
         // create one top level collection to organize the things in the scene
         Group root = new Group();
+
         // make some shapes and set their properties
-        // myPaddle = new Paddle(width, height);
         createPaddle();
         createBouncer();
         createAllWalls();
         createBrick();
 
+        // append all  shapes to root
         root.getChildren().add(myBouncer);
         root.getChildren().add(myPaddle);
+
+        // root.getChildren().add(allWalls);
+        // for (Wall w: allWalls) { root.getChildren().add(w); }
+
         root.getChildren().add(myLeftWall);
         root.getChildren().add(myRightWall);
         root.getChildren().add(myTopWall);
@@ -123,6 +129,7 @@ public class Main extends Application {
 
         // create a place to see the shapes
         Scene scene = new Scene(root);
+
         // respond to input
         scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
         return scene;
@@ -223,7 +230,7 @@ public class Main extends Application {
     // TODO: Modify collision detection to SIDE of an object, deflect appropriately
     private void checkCollision() {
         double scale = 0; double shift = 1;
-        if (shapeCollision(myBouncer, myPaddle)) { // && ballAbovePaddle()) {
+        if (shapeCollision(myBouncer, myPaddle)) {
             angleDeflect();
         } else if (shapeCollision(myBouncer, myTopWall)) {
             scale = -1; shift = 0;
@@ -239,10 +246,6 @@ public class Main extends Application {
 
     private boolean shapeCollision(Shape s1, Shape s2) {
         return Shape.intersect(s1, s2).getBoundsInLocal().getWidth() != -1;
-    }
-
-    private boolean ballAbovePaddle() {
-        return myBouncer.getCenterY() + myBouncer.getRadius() > myPaddle.getY();
     }
 
     private void basicDeflect(double scale, double shift) {

@@ -1,10 +1,11 @@
 package breakout;
 
+import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
-public class Wall {
+public class Wall extends Node {
 
     private Rectangle myWall;
 
@@ -16,7 +17,7 @@ public class Wall {
         myWall = rect;
     }
 
-    private Rectangle getWall() {
+    public Rectangle getMyWall() {
         return myWall;
     }
 

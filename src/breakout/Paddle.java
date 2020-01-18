@@ -11,12 +11,15 @@ public class Paddle extends Node {
 
     // Paddle metadata
     public static final int PADDLE_HEIGHT = 10;
-    public static final int PADDLE_SPEED = 10;
-    public static final int PADDLE_FLOAT = 30;              // paddle pixel float above bottom of screen
+    public static final int PADDLE_FLOAT = 50;              // paddle pixel float above bottom of screen
     public static final double PADDLE_EDGE = Math.PI / 4;   // max paddle angular deflection off edge
     public static final Paint PADDLE_COLOR = Color.BLUEVIOLET;
-    public static int PADDLE_WIDTH = 100;
 
+    // Paddle data subject to change
+    public static int PADDLE_WIDTH = 100;
+    public static int PADDLE_SPEED = 10;
+
+    // Constructors
     public Paddle(int width, int height) {
         myPaddle = new Rectangle();
         myPaddle.setX(width / 2 - myPaddle.getBoundsInLocal().getWidth() / 2);
@@ -26,8 +29,16 @@ public class Paddle extends Node {
         myPaddle.setFill(PADDLE_COLOR);
     }
 
-    @Override
-    public Node getStyleableNode() {
-        return null;
+    public Rectangle getMyPaddle() {
+        return myPaddle;
     }
+
+    public int getPaddleSpeed() {
+        return PADDLE_SPEED;
+    }
+
+    public void setPaddleSpeed(int speed) {
+        PADDLE_SPEED = speed;
+    }
+
 }
