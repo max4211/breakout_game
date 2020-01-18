@@ -167,13 +167,10 @@ public class Game extends Application {
         double[] redirect = new double[2];
         if (checkBottomCollision(r, c)) {
             redirect[0] = -1; redirect[1] = 0;
-            System.out.print("Bottom collision!!!");
         } else if (checkRightCollision(r, c)) {
             redirect[0] = -1; redirect[1] = Math.PI;
-            System.out.print("Bottom collision!!!");
         } else if (checkLeftCollision(r, c)) {
             redirect[0] = -1; redirect[1] = Math.PI;
-            System.out.print("Bottom collision!!!");
         } else {
             ;
         }
@@ -202,7 +199,7 @@ public class Game extends Application {
         double bouncerX = b.getMyBouncer().getCenterX();
         double paddleWidth = p.getMyPaddle().getWidth();
         double paddleCenter = paddleX + paddleWidth / 2;
-        b.setBouncerTheta(- Math.PI / 2 + 2 * (bouncerX - paddleCenter) * (p.PADDLE_WIDTH / paddleWidth));
+        b.setBouncerTheta(- Math.PI / 2 + 2 * (bouncerX - paddleCenter) * (p.PADDLE_EDGE / paddleWidth));
     }
 
     private boolean shapeCollision(Shape s1, Shape s2) {
