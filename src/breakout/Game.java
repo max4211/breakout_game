@@ -34,7 +34,6 @@ public class Game extends Application {
     private static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
     private static final Paint BACKGROUND = Color.AZURE;
 
-
     // some things needed to remember during the game
     private Scene myScene;
     private Paddle myPaddle;
@@ -85,7 +84,7 @@ public class Game extends Application {
     private void createBricks() {
         double[] wallBounds = getWallBounds();
         double paddleBound = getPaddleBound();
-        
+
     }
 
     private double getPaddleBound() {

@@ -28,6 +28,16 @@ public class Wall extends Node {
         myName = name;
     }
 
+    public Wall(int x, int y, int width, int height) {
+        myWall = new Rectangle (x, y, width, height);
+        myName = "";
+    }
+
+    public Wall(Rectangle rect) {
+        myWall = rect;
+        myName = "";
+    }
+
     public String getMyName() {
         return myName;
     }
