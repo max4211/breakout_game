@@ -156,21 +156,6 @@ public class Game extends Application {
                 }
             }
         }
-
-        /*
-        if (shapeCollision(myBouncer, myPaddle)) {
-            angleDeflect();
-        } else if (shapeCollision(myBouncer, myTopWall)) {
-            scale = -1; shift = 0;
-        } else if (shapeCollision(myBouncer, myLeftWall)){
-            scale = -1; shift = Math.PI;
-        } else if (shapeCollision(myBouncer, myRightWall)) {
-            scale = -1; shift = Math.PI;
-        }
-        if (scale != 0) {
-            basicDeflect(scale, shift);
-        }
-        */
     }
 
     private void basicDeflect(double[] redirect, Bouncer b) {
@@ -180,14 +165,32 @@ public class Game extends Application {
 
     private double[] checkRectangleBouncerCollision(Rectangle r, Circle c) {
         double[] redirect = new double[2];
-        if ( checkBottomCollision(r, c)) {
+        if (checkBottomCollision(r, c)) {
             redirect[0] = -1; redirect[1] = 0;
+            System.out.print("Bottom collision!!!");
+        } else if (checkRightCollision(r, c)) {
+            redirect[0] = -1; redirect[1] = Math.PI;
+            System.out.print("Bottom collision!!!");
+        } else if (checkLeftCollision(r, c)) {
+            redirect[0] = -1; redirect[1] = Math.PI;
             System.out.print("Bottom collision!!!");
         } else {
             ;
         }
-
         return redirect;
+    }
+
+    // TODO: Implement refactored method (elastic) below
+    private boolean checkElasticCollision(Rectangle r, Circle c, double xShift, double yShift) {
+        return r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX() + xShift, c.getBoundsInLocal().getCenterY() + yShift);
+    }
+
+    private boolean checkRightCollision(Rectangle r, Circle c) {
+        return r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX() + c.getRadius(), c.getBoundsInLocal().getCenterY());
+    }
+
+    private boolean checkLeftCollision(Rectangle r, Circle c) {
+        return r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX() - c.getRadius(), c.getBoundsInLocal().getCenterY());
     }
 
     private boolean checkBottomCollision(Rectangle r, Circle c) {
