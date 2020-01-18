@@ -17,12 +17,9 @@ import javafx.util.Duration;
 import java.lang.Math.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
- * Messing around with JFX
- * Code base attributed to Robert C. Duval
- * @author Robert C. Duvall
+ * Main game engine to process game rules, calls additional classes
  * @author Max Smith
  */
 public class Game extends Application {
@@ -36,23 +33,9 @@ public class Game extends Application {
     public static final Paint BACKGROUND = Color.AZURE;
     public static int LIVES_LEFT = 3;
 
-    // Paddle metadata
-    public static final int PADDLE_HEIGHT = 10;
-    public static final int PADDLE_SPEED = 10;
-    public static final int PADDLE_FLOAT = 30;              // paddle pixel float above bottom of screen
-    public static final double PADDLE_EDGE = Math.PI / 4;   // max paddle angular deflection off edge
-    public static final Paint PADDLE_COLOR = Color.BLUEVIOLET;
-    public static int PADDLE_WIDTH = 100;
-
-    // Wall metadata
-    public static final int WALL_FLOAT = 0;
-    public static final int WALL_WIDTH = 10;
-    public static final Paint WALL_FILL = Color.BLACK;
-
     // some things needed to remember during game
     private Scene myScene;
     private Paddle myPaddle;
-    // private Collection<Paddle> allPaddles = new ArrayList<Paddle>();
     private Collection<Wall> allWalls = new ArrayList<Wall>();
     private Collection<Bouncer> allBouncers = new ArrayList<Bouncer>();
 
@@ -97,14 +80,11 @@ public class Game extends Application {
     }
 
     private void createPaddle() {
-        // allPaddles.add(new Paddle(SCREEN_WIDTH, SCREEN_HEIGHT));
         myPaddle = new Paddle(SCREEN_WIDTH, SCREEN_HEIGHT);
     }
 
     private void createAllWalls() {
-        allWalls.add(new Wall(createRectangle(WALL_FLOAT, WALL_FLOAT, WALL_WIDTH, SCREEN_HEIGHT - WALL_FLOAT)));
-        allWalls.add(new Wall(createRectangle(SCREEN_WIDTH - 2 * WALL_FLOAT, WALL_FLOAT, WALL_WIDTH, SCREEN_HEIGHT - WALL_FLOAT)));
-        allWalls.add(new Wall(createRectangle(WALL_FLOAT, WALL_FLOAT, SCREEN_WIDTH - 3 * WALL_FLOAT, WALL_WIDTH)));
+        allWalls = Wall.createAllWalls();
     }
 
     private void createBouncers() {
