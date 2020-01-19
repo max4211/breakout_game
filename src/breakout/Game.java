@@ -84,11 +84,13 @@ public class Game extends Application {
         // createBricks();
 
         root = addPaddleToRoot(root);
-        // root = addToRoot(root, wallGroup);
-        // root = addToRoot(root, bouncerGroup);
+        root = addToRoot(root, wallGroup);
+        root = addToRoot(root, bouncerGroup);
         // root = addToRoot(root, brickGroup);
 
         // resetBouncer();
+
+        scanGroup(root);
 
         // create a place to see the shapes and respond to input
         Scene scene = new Scene(root);
@@ -103,6 +105,16 @@ public class Game extends Application {
         // moveBouncers(elapsedTime);
         // collisionDetection();
         // outOfBoundsDetection();
+    }
+
+    private void scanGroup(Group root) {
+        for (Node n: root.getChildren()) {
+            if (n instanceof Group) {
+                System.out.println("new Group detected, diving deeper");
+                scanGroup((Group) n);
+            }
+            System.out.println("node: " + n.getClass());
+        }
     }
 
     private Group addToRoot(Group root, Group addMe) {
@@ -121,9 +133,8 @@ public class Game extends Application {
     }
 
     private void createAllWalls() {
-        allWalls = Wall.createAllWalls();
         // for (Wall w: allWalls) {wallGroup.getChildren().add(w.getMyWall());}
-        for (Wall w: allWalls) {wallGroup.getChildren().add(w);}
+        for (Wall w: Wall.createAllWalls()) {wallGroup.getChildren().add(w);}
     }
 
     private void createBouncers() {
@@ -136,6 +147,7 @@ public class Game extends Application {
         double paddleBound = getPaddleBound();
         allBricks.addAll(Brick.createAllBricks(wallBounds, paddleBound, BRICK_FIELD_TEXT));
         for (Brick k: allBricks) {brickGroup.getChildren().add(k);}
+        // for (Brick k: allBricks) {brickGroup.getChildren().add(k.getMyBrick());}
     }
 
     private double getPaddleBound() {
