@@ -84,11 +84,11 @@ public class Game extends Application {
         // createBricks();
 
         root = addPaddleToRoot(root);
-        root = addToRoot(root, wallGroup);
-        root = addToRoot(root, bouncerGroup);
+        // root = addToRoot(root, wallGroup);
+        // root = addToRoot(root, bouncerGroup);
         // root = addToRoot(root, brickGroup);
 
-        resetBouncer();
+        // resetBouncer();
 
         // create a place to see the shapes and respond to input
         Scene scene = new Scene(root);
@@ -111,7 +111,8 @@ public class Game extends Application {
     }
 
     private Group addPaddleToRoot(Group root) {
-        root.getChildren().add(myPaddle.getMyPaddle());
+        // root.getChildren().add(myPaddle.getMyPaddle());
+        root.getChildren().add(myPaddle);
         return root;
     }
 
@@ -121,12 +122,13 @@ public class Game extends Application {
 
     private void createAllWalls() {
         allWalls = Wall.createAllWalls();
-        for (Wall w: allWalls) {wallGroup.getChildren().add(w.getMyWall());}
+        // for (Wall w: allWalls) {wallGroup.getChildren().add(w.getMyWall());}
+        for (Wall w: allWalls) {wallGroup.getChildren().add(w);}
     }
 
     private void createBouncers() {
-        allBouncers.add(new Bouncer());
-        bouncerGroup.getChildren().add(new Bouncer().getMyBouncer());
+        // bouncerGroup.getChildren().add(new Bouncer().getMyBouncer());
+        bouncerGroup.getChildren().add(new Bouncer());
     }
 
     private void createBricks() {
