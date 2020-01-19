@@ -15,10 +15,14 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.util.Duration;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.Math.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.Scanner;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Main game engine to process game rules, calls additional classes
@@ -41,6 +45,24 @@ public class Game extends Application {
 
     // Testing  brick creation
     private static final String BRICK_FIELD_TEXT = "resources/level_test.txt";
+
+    // Brick metadata read from file
+    private static int BRICKS_PER_ROW;
+    private static int ROWS_OF_BRICKS;
+
+    // dynamic variable sizes to configure at start of level
+    private static double BRICK_HEIGHT;
+    private static double BRICK_WIDTH;
+
+    // dynamic variable locations calculated from file config
+    private static double BRICK_START_X;
+    private static double BRICK_START_Y;
+
+    // Brick padding (as percent values)
+    private static final double BRICK_TOP_PAD = 0.30;
+    private static final double BRICK_BOTTOM_PAD = 0.30;
+    private static final double BRICK_RIGHT_PAD = 0.15;
+    private static final double BRICK_LEFT_PAD = 0.15;
 
     // some things needed to remember during the game
     private Scene myScene;
@@ -88,6 +110,8 @@ public class Game extends Application {
 
         resetBouncer((Bouncer) bouncerGroup.getChildren().get(0));
 
+        scanRoot(root);
+
         // create a place to see the shapes and respond to input
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
         // Scene scene = new Scene(root);
@@ -95,6 +119,14 @@ public class Game extends Application {
         return scene;
     }
 
+    private void scanRoot(Group root) {
+        for (Node n: root.getChildren()) {
+            System.out.println("node: " + n.getClass());
+            if (n instanceof Group) {
+                scanRoot((Group)n);
+            }
+        }
+    }
 
     // Change properties of shapes in small ways to animate them over time
     private void step (double elapsedTime) {
@@ -129,8 +161,56 @@ public class Game extends Application {
     private void createBricks() {
         double[] wallBounds = getWallBounds();
         double paddleBound = getPaddleBound();
-        for (Brick k: Brick.createAllBricks(wallBounds, paddleBound, BRICK_FIELD_TEXT)) {brickGroup.getChildren().add(k);}
+        for (Brick k: createAllBricks(wallBounds, paddleBound, BRICK_FIELD_TEXT)) {brickGroup.getChildren().add(k);}
     }
+
+
+    private static Collection<Brick> createAllBricks(double[] wallBounds, double paddleBound, String brickFieldText) {
+        Collection<Brick> allBricks = new CopyOnWriteArrayList<>();
+        int brickRow = 0;
+        try {
+            Scanner scan = new Scanner(new File(brickFieldText));
+            while (scan.hasNextLine()) {
+                String[] dataSplit = scan.nextLine().split(" ");
+                for (String s: dataSplit) {
+                    if (s.equals("BRICKS_PER_ROW")) {
+                        BRICKS_PER_ROW = Integer.parseInt(dataSplit[1]);
+                    } else if (s.equals("ROWS_OF_BRICKS")) {
+                        ROWS_OF_BRICKS = Integer.parseInt(dataSplit[1]);
+                    } else {
+                        if (brickRow == 0) {calculateBrickDimensions(wallBounds, paddleBound);}
+                        allBricks.addAll(createBrickList(dataSplit, brickRow));
+                        brickRow ++;
+                    }
+                    break;
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("ERROR: " + e);
+        }
+        return allBricks;
+    }
+
+    private static Collection<Brick> createBrickList(String[] dataSplit, int brickRow) {
+        Collection<Brick> brickList = new ArrayList<Brick>();
+        for (int i = 0; i < dataSplit.length; i ++) {
+            int power = Integer.parseInt(dataSplit[i]);
+            if (power > 0) {
+                brickList.add(new Brick(BRICK_START_X + (BRICK_WIDTH * (i+1)), BRICK_START_Y + (BRICK_HEIGHT * brickRow), BRICK_WIDTH, BRICK_HEIGHT, power));
+            }
+        }
+        return brickList;
+    }
+
+    private static void calculateBrickDimensions(double[] wallBounds, double paddleBound) {
+        double horizontalSpace = wallBounds[1] - wallBounds[0];
+        double verticalSpace = paddleBound - wallBounds[2];
+        BRICK_WIDTH = (horizontalSpace) * (1 - (BRICK_LEFT_PAD + BRICK_RIGHT_PAD)) / BRICKS_PER_ROW;
+        BRICK_HEIGHT = (verticalSpace) * (1 - (BRICK_TOP_PAD + BRICK_BOTTOM_PAD)) / ROWS_OF_BRICKS;
+        BRICK_START_X = horizontalSpace * BRICK_LEFT_PAD;
+        BRICK_START_Y = verticalSpace * BRICK_RIGHT_PAD;
+    }
+
 
     private double getPaddleBound() {
         return myPaddle.getBoundsInLocal().getMinY();
@@ -202,7 +282,6 @@ public class Game extends Application {
                         redirect = checkRectangleBouncerCollision(w, b);
                         if (redirect[0] != 0) {
                             basicDeflect(redirect, b);
-                            redirect = new double[2];
                         }
                     }
                 }
@@ -211,11 +290,10 @@ public class Game extends Application {
                         Brick k = (Brick) n3;
                         redirect = checkRectangleBouncerCollision(k, b);
                         if (redirect[0] != 0) {
-                            System.out.println("brick collision found, checking power");
+                            System.out.println("brick collision found, brick power: " + k.getBrickPower());
                             if (k.getBrickPower() > 0) {
-                                System.out.println("power empty");
+                                System.out.println("power left");
                                 basicDeflect(redirect, b);
-                                redirect = new double[2];
                                 if (k.hitBrick(b.getBouncerDamage())) {
                                     System.out.println("adding brick to destroyed list");
                                     destroyedBricks.add(n3);
