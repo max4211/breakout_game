@@ -17,15 +17,13 @@ public class Brick extends Rectangle {
     // Brick constant metadata
     private static final double BRICK_STROKE_WIDTH = 0.05;
 
-    private static Map<Integer, javafx.scene.paint.Paint> BRICK_COLORS;
-
     // dynamic variables to update based on brick collisions
     private int BRICK_POWER;
+    private static Map<Integer, javafx.scene.paint.Paint> BRICK_COLORS;
 
     public Brick(double x, double y, double width, double height, int power) {
         super(x, y, width, height);
         BRICK_COLORS = BrickStyler.styleBricks();
-        System.out.println("Brick constructor called, new brick created");
         this.BRICK_POWER = power;
         updateBrickColor();
         this.setStrokeWidth(this.getWidth() * BRICK_STROKE_WIDTH);
@@ -50,4 +48,5 @@ public class Brick extends Rectangle {
             this.setFill(BRICK_COLORS.get(this.BRICK_POWER));
         }
     }
+
 }

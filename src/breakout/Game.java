@@ -36,19 +36,21 @@ public class Game extends Application {
     public static final int SCREEN_WIDTH = 400;
     public static final int SCREEN_HEIGHT = 400;
     private static int LIVES_LEFT = 3;
+    private static int POINTS_SCORED = 0;
+    private int LEVEL = 1;
 
     // Game play metadata
-    private static final int FRAMES_PER_SECOND = 120;
+    private static final int FRAMES_PER_SECOND = 80;
     private static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     private static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
     private static final Paint BACKGROUND = Color.AZURE;
 
     // Testing  brick creation
-    private static final String BRICK_FIELD_TEXT = "resources/level_test.txt";
+    private static String BRICK_FIELD_TEXT;
 
     // Brick metadata read from file
-    private static int BRICKS_PER_ROW;
-    private static int ROWS_OF_BRICKS;
+    private int BRICKS_PER_ROW;
+    private int ROWS_OF_BRICKS;
 
     // dynamic variable sizes to configure at start of level
     private static double BRICK_HEIGHT;
@@ -109,8 +111,7 @@ public class Game extends Application {
         root = addToRoot(root, brickGroup);
 
         resetBouncer((Bouncer) bouncerGroup.getChildren().get(0));
-
-        scanRoot(root);
+        // scanRoot(root);
 
         // create a place to see the shapes and respond to input
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT, BACKGROUND);
@@ -134,6 +135,7 @@ public class Game extends Application {
         moveBouncers(elapsedTime);
         collisionDetection();
         outOfBoundsDetection();
+        checkLevelClear();
     }
 
     private Group addToRoot(Group root, Group addMe) {
@@ -159,58 +161,13 @@ public class Game extends Application {
     }
 
     private void createBricks() {
+        System.out.println("STARTING LEVEL: " + LEVEL);
         double[] wallBounds = getWallBounds();
         double paddleBound = getPaddleBound();
-        for (Brick k: createAllBricks(wallBounds, paddleBound, BRICK_FIELD_TEXT)) {brickGroup.getChildren().add(k);}
+        BRICK_FIELD_TEXT = "resources/level_" + LEVEL + ".txt";
+        Collection<Brick> myBricks = createAllBricks(wallBounds, paddleBound, BRICK_FIELD_TEXT);
+        for (Brick k: myBricks) {brickGroup.getChildren().add(k);}
     }
-
-
-    private static Collection<Brick> createAllBricks(double[] wallBounds, double paddleBound, String brickFieldText) {
-        Collection<Brick> allBricks = new CopyOnWriteArrayList<>();
-        int brickRow = 0;
-        try {
-            Scanner scan = new Scanner(new File(brickFieldText));
-            while (scan.hasNextLine()) {
-                String[] dataSplit = scan.nextLine().split(" ");
-                for (String s: dataSplit) {
-                    if (s.equals("BRICKS_PER_ROW")) {
-                        BRICKS_PER_ROW = Integer.parseInt(dataSplit[1]);
-                    } else if (s.equals("ROWS_OF_BRICKS")) {
-                        ROWS_OF_BRICKS = Integer.parseInt(dataSplit[1]);
-                    } else {
-                        if (brickRow == 0) {calculateBrickDimensions(wallBounds, paddleBound);}
-                        allBricks.addAll(createBrickList(dataSplit, brickRow));
-                        brickRow ++;
-                    }
-                    break;
-                }
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println("ERROR: " + e);
-        }
-        return allBricks;
-    }
-
-    private static Collection<Brick> createBrickList(String[] dataSplit, int brickRow) {
-        Collection<Brick> brickList = new ArrayList<Brick>();
-        for (int i = 0; i < dataSplit.length; i ++) {
-            int power = Integer.parseInt(dataSplit[i]);
-            if (power > 0) {
-                brickList.add(new Brick(BRICK_START_X + (BRICK_WIDTH * i), BRICK_START_Y + (BRICK_HEIGHT * brickRow), BRICK_WIDTH, BRICK_HEIGHT, power));
-            }
-        }
-        return brickList;
-    }
-
-    private static void calculateBrickDimensions(double[] wallBounds, double paddleBound) {
-        double horizontalSpace = wallBounds[1] - wallBounds[0];
-        double verticalSpace = paddleBound - wallBounds[2];
-        BRICK_WIDTH = (horizontalSpace) * (1 - (BRICK_LEFT_PAD + BRICK_RIGHT_PAD)) / BRICKS_PER_ROW;
-        BRICK_HEIGHT = (verticalSpace) * (1 - (BRICK_TOP_PAD + BRICK_BOTTOM_PAD)) / ROWS_OF_BRICKS;
-        BRICK_START_X = horizontalSpace * BRICK_LEFT_PAD;
-        BRICK_START_Y = verticalSpace * BRICK_RIGHT_PAD;
-    }
-
 
     private double getPaddleBound() {
         return myPaddle.getBoundsInLocal().getMinY();
@@ -239,6 +196,11 @@ public class Game extends Application {
         b.setCenterY(myPaddle.getY() - b.getRadius());
         b.setBouncerStuck(true);
         b.setBouncerSpeed(0);
+        displayLives();
+    }
+
+    private void displayLives() {
+        System.out.println("Lives: " + LIVES_LEFT);
     }
 
     // TODO: Implement out of bounds detection
@@ -258,6 +220,14 @@ public class Game extends Application {
         }
     }
 
+    private void checkLevelClear() {
+        if (brickGroup.getChildren().isEmpty()) {
+            System.out.println("LEVEL " + LEVEL + " CLEARED!!");
+            LEVEL ++;
+            createBricks();
+        }
+    }
+
     private boolean checkLives() {
         return (LIVES_LEFT > 0);
     }
@@ -267,38 +237,24 @@ public class Game extends Application {
         System.exit(0);
     }
 
+    // TODO: Refactor collision detection
     private void collisionDetection() {
-        double[] redirect;
         Collection<Node> destroyedBricks = new ArrayList<Node>();
         for (Node n1: bouncerGroup.getChildren()) {
             if (n1 instanceof Bouncer) {
                 Bouncer b = (Bouncer) n1;
-                if (shapeCollision(b, myPaddle)) {
-                    angleDeflect(b, myPaddle);
-                }
+                testPaddleCollision(b);
                 for (Node n2: wallGroup.getChildren()) {
                     if (n2 instanceof Wall) {
                         Wall w = (Wall) n2;
-                        redirect = checkRectangleBouncerCollision(w, b);
-                        if (redirect[0] != 0) {
-                            basicDeflect(redirect, b);
-                        }
+                        testWallCollision(b, w);
                     }
                 }
                 for (Node n3: brickGroup.getChildren()) {
                     if (n3 instanceof Brick) {
                         Brick k = (Brick) n3;
-                        redirect = checkRectangleBouncerCollision(k, b);
-                        if (redirect[0] != 0) {
-                            System.out.println("brick collision found, brick power: " + k.getBrickPower());
-                            if (k.getBrickPower() > 0) {
-                                System.out.println("power left");
-                                basicDeflect(redirect, b);
-                                if (k.hitBrick(b.getBouncerDamage())) {
-                                    System.out.println("adding brick to destroyed list");
-                                    destroyedBricks.add(n3);
-                                }
-                            }
+                        if (testBrickCollision(b, k)) {
+                            destroyedBricks.add(n3);
                         }
                     }
                 }
@@ -308,13 +264,35 @@ public class Game extends Application {
         }
     }
 
+    private boolean testBrickCollision(Bouncer b, Brick k) {
+        double[] redirect = checkRectangleBouncerCollision(k, b);
+        if (redirect[0] != 0) {
+            if (k.getBrickPower() > 0) {
+                basicDeflect(redirect, b);
+                if (k.hitBrick(b.getBouncerDamage())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void testWallCollision(Bouncer b, Wall w) {
+        double[] redirect = checkRectangleBouncerCollision(w, b);
+        if (redirect[0] != 0) {
+            basicDeflect(redirect, b);
+        }
+    }
+
+    private void testPaddleCollision(Bouncer b) {
+        if (shapeCollision(b, myPaddle)) {
+            angleDeflect(b, myPaddle);
+        }
+    }
+
     private void clearBricks(Collection<Node> destroyedBricks) {
         if (!destroyedBricks.isEmpty()) {
-            System.out.println("clearing bricks");
-            int counter = 0;
             for (Node n: destroyedBricks) {
-                System.out.println("brick #" + counter + " cleared.");
-                counter ++;
                 brickGroup.getChildren().remove(n);
             }
         }
@@ -398,7 +376,56 @@ public class Game extends Application {
             sideKeyPress(-1);
         } else if (code == KeyCode.SPACE) {
             spaceKeyPress();
+        } else if (code == KeyCode.L) {
+            LIVES_LEFT ++;
+            displayLives();
         }
+    }
+
+    public Collection<Brick> createAllBricks(double[] wallBounds, double paddleBound, String brickFieldText) {
+        Collection<Brick> allBricks = new CopyOnWriteArrayList<>();
+        int brickRow = 0;
+        try {
+            Scanner scan = new Scanner(new File(brickFieldText));
+            while (scan.hasNextLine()) {
+                String[] dataSplit = scan.nextLine().split(" ");
+                for (String s: dataSplit) {
+                    if (s.equals("BRICKS_PER_ROW")) {
+                        BRICKS_PER_ROW = Integer.parseInt(dataSplit[1]);
+                    } else if (s.equals("ROWS_OF_BRICKS")) {
+                        ROWS_OF_BRICKS = Integer.parseInt(dataSplit[1]);
+                    } else {
+                        if (brickRow == 0) {calculateBrickDimensions(wallBounds, paddleBound);}
+                        allBricks.addAll(createBrickList(dataSplit, brickRow));
+                        brickRow ++;
+                    }
+                    break;
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("ERROR: " + e);
+        }
+        return allBricks;
+    }
+
+    private Collection<Brick> createBrickList(String[] dataSplit, int brickRow) {
+        Collection<Brick> brickList = new ArrayList<Brick>();
+        for (int i = 0; i < dataSplit.length; i ++) {
+            int power = Integer.parseInt(dataSplit[i]);
+            if (power > 0) {
+                brickList.add(new Brick(BRICK_START_X + (BRICK_WIDTH * i), BRICK_START_Y + (BRICK_HEIGHT * brickRow), BRICK_WIDTH, BRICK_HEIGHT, power));
+            }
+        }
+        return brickList;
+    }
+
+    private void calculateBrickDimensions(double[] wallBounds, double paddleBound) {
+        double horizontalSpace = wallBounds[1] - wallBounds[0];
+        double verticalSpace = paddleBound - wallBounds[2];
+        BRICK_WIDTH = (horizontalSpace) * (1 - (BRICK_LEFT_PAD + BRICK_RIGHT_PAD)) / BRICKS_PER_ROW;
+        BRICK_HEIGHT = (verticalSpace) * (1 - (BRICK_TOP_PAD + BRICK_BOTTOM_PAD)) / ROWS_OF_BRICKS;
+        BRICK_START_X = horizontalSpace * BRICK_LEFT_PAD;
+        BRICK_START_Y = verticalSpace * BRICK_RIGHT_PAD;
     }
 
     public static void main (String[] args) {

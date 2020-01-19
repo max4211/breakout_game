@@ -6,9 +6,9 @@ import java.io.PrintWriter;
 public class LevelGenerator {
 
     // Vars visible to external devices
-    public static String FILE_NAME = "resources/level_test.txt";
+    public static int LEVEL = 3;
+    public static String FILE_NAME = "resources/level_" + LEVEL + ".txt";
     public static final int SIDE_PAD = 2;     // maintain less than 1/2 of BRICKS_PER_ROW
-    public static int LEVEL_DIFFICULTY = 6;
 
     // Vars private to this class
     private static final int BRICKS_PER_ROW = 10;
@@ -26,7 +26,7 @@ public class LevelGenerator {
             for (int j = 0; j < BRICKS_PER_ROW; j ++) {
                 localPad ++;
                 if ((localPad > SIDE_PAD) && (localPad <= (BRICKS_PER_ROW - SIDE_PAD))) {
-                    brick = (int)(Math.random() * LEVEL_DIFFICULTY + 1);
+                    brick = (int)(Math.random() * LEVEL + 1);
                 } else {
                     brick = 0;
                 }
@@ -46,7 +46,6 @@ public class LevelGenerator {
             System.out.print(s + SEPARATOR);
             w.print(s + SEPARATOR);
         }
-
     }
 
     public static void main (String[] args) throws FileNotFoundException {
