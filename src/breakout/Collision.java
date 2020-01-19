@@ -73,8 +73,7 @@ public class Collision {
         double[] redirect = checkRectangleBouncerCollision(k, b);
         if (redirect[0] != 0) {
             if (k.getBrickPower() > 0) {
-                System.out.println("FOUND BRICK COLLISION");
-                System.out.println("scale: " + redirect[0] + ", shift: " + redirect[1]);
+                printCollision(b, "BRICK", redirect);
                 basicDeflect(redirect, b);
                 if (k.hitBrick(b.getBouncerDamage())) {
                     return true;
@@ -87,8 +86,7 @@ public class Collision {
     private static void testWallCollision(Bouncer b, Wall w) {
         double[] redirect = checkRectangleBouncerCollision(w, b);
         if (redirect[0] != 0) {
-            System.out.println("FOUND WALL COLLISION");
-            System.out.println("scale: " + redirect[0] + ", shift: " + redirect[1]);
+            printCollision(b, "WALL", redirect);
             basicDeflect(redirect, b);
         }
     }
@@ -102,6 +100,13 @@ public class Collision {
     private static void basicDeflect(double[] redirect, Bouncer b) {
         double scale = redirect[0]; double shift = redirect[1];
         b.setBouncerTheta(b.getBouncerTheta() * scale + shift);
+    }
+
+    private static void printCollision(Bouncer b, String object, double[] redirect) {
+        System.out.println("FOUND " + object + " COLLISION");
+        System.out.println("scale: " + redirect[0] + ", shift: " + redirect[1]);
+        System.out.println("theta(1): " + b.getBouncerTheta());
+        System.out.println("theta(0): " + b.getBouncerTheta());
     }
 
     private static void angleDeflect(Bouncer b, Paddle p) {

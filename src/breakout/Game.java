@@ -176,7 +176,6 @@ public class Game extends Application {
 
     private void createBricks() {
         System.out.println("STARTING LEVEL: " + LEVEL);
-        createBouncers();
         LIVES_AT_LEVEL_START = LIVES_LEFT;
         double[] wallBounds = getWallBounds();
         double paddleBound = getPaddleBound();
@@ -242,6 +241,7 @@ public class Game extends Application {
             LEVEL ++;
             clearBouncers();
             createBricks();
+            createBouncers();
         }
     }
 
@@ -300,14 +300,15 @@ public class Game extends Application {
             displayLives();
         } else if (code == KeyCode.R) {
             restartLevel();
-        } else if (code == KeyCode.SOFTKEY_2) {
+        } else if (code == KeyCode.NUMPAD2) {
             jumpToLevel(2);
-        } else if (code == KeyCode.SOFTKEY_3) {
+        } else if (code == KeyCode.NUMPAD3) {
             jumpToLevel(3);
         }
     }
 
     private void jumpToLevel(int level) {
+        System.out.println("JUMPING TO LEVEL: " + level);
         LEVEL = level;
         restartLevel();
     }

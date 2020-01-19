@@ -3,12 +3,13 @@ package breakout;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+import java.util.Map;
+
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -40,7 +41,7 @@ public class Brick extends Rectangle {
         return (this.BRICK_POWER < 1);
     }
 
-    public void updateBrickColor() {
+    private void updateBrickColor() {
         if (this.BRICK_POWER < 1) {
             this.setFill(Color.TRANSPARENT);
             this.setStroke(Color.TRANSPARENT);
