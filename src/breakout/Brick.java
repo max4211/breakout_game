@@ -17,7 +17,7 @@ public class Brick extends Rectangle {
     private static final double BRICK_STROKE_WIDTH = 0.05;
 
     // dynamic variables to update based on brick collisions
-    private static int BRICK_POWER;
+    private int BRICK_POWER;
 
     public Brick(double x, double y, double width, double height, int power) {
         super(x, y, width, height);
