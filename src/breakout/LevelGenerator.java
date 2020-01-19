@@ -6,7 +6,7 @@ import java.io.PrintWriter;
 public class LevelGenerator {
 
     // Vars visible to external devices
-    public static int LEVEL = 3;
+    public static int LEVEL;
     public static String FILE_NAME = "resources/level_" + LEVEL + ".txt";
     public static final int SIDE_PAD = 2;     // maintain less than 1/2 of BRICKS_PER_ROW
 
@@ -15,8 +15,13 @@ public class LevelGenerator {
     private static final int ROWS_OF_BRICKS = 3;
     private static String SEPARATOR = " ";
 
-    // TODO: Incorporate side padding to level construction
-    public static void createLevel() throws FileNotFoundException {
+    public LevelGenerator(int level) throws FileNotFoundException {
+        LEVEL = level;
+        createLevel(LEVEL);
+    }
+
+    private static void createLevel(int level) throws FileNotFoundException {
+        LEVEL = level;
         PrintWriter writer = new PrintWriter(FILE_NAME);
         int brick; int localPad;
         printInt("BRICKS_PER_ROW" + SEPARATOR + BRICKS_PER_ROW, writer, true);
@@ -38,6 +43,12 @@ public class LevelGenerator {
         writer.close();
     }
 
+    private void generateLevels() throws FileNotFoundException {
+        for (int i = 1; i <  3; i ++) {
+            createLevel(i);
+        }
+    }
+
     private static void printInt(String s, PrintWriter w, boolean newLine) {
         if (newLine) {
             System.out.println(s);
@@ -47,9 +58,4 @@ public class LevelGenerator {
             w.print(s + SEPARATOR);
         }
     }
-
-    public static void main (String[] args) throws FileNotFoundException {
-        createLevel();
-    }
-
 }

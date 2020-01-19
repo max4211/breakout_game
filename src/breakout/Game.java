@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Main game engine to process game rules, calls additional classes
@@ -36,6 +37,7 @@ public class Game extends Application {
     public static final int SCREEN_WIDTH = 400;
     public static final int SCREEN_HEIGHT = 400;
     private static int LIVES_LEFT = 3;
+    private static int LIVES_AT_LEVEL_START;
     private static int POINTS_SCORED = 0;
     private int LEVEL = 1;
 
@@ -74,6 +76,7 @@ public class Game extends Application {
     private Group wallGroup = new Group();
     private Group bouncerGroup = new Group();
     private Group brickGroup = new Group();
+    private Group textGroup = new Group();
 
     /**
      * Initialize what will be displayed and how it will be updated.
@@ -99,6 +102,16 @@ public class Game extends Application {
         Group root = new Group();
 
         // make some shapes and set their properties
+        root = initializeRoot(root);
+
+        // create a place to see the shapes and respond to input
+        Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT, BACKGROUND);
+        // Scene scene = new Scene(root);
+        scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
+        return scene;
+    }
+
+    private Group initializeRoot(Group root) {
         createPaddle();
         createAllWalls();
         createBouncers();
@@ -112,12 +125,7 @@ public class Game extends Application {
 
         resetBouncer((Bouncer) bouncerGroup.getChildren().get(0));
         // scanRoot(root);
-
-        // create a place to see the shapes and respond to input
-        Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT, BACKGROUND);
-        // Scene scene = new Scene(root);
-        scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
-        return scene;
+        return root;
     }
 
     private void scanRoot(Group root) {
@@ -156,12 +164,20 @@ public class Game extends Application {
         for (Wall w: Wall.createAllWalls()) {wallGroup.getChildren().add(w);}
     }
 
+    private void clearBouncers() {
+        bouncerGroup.getChildren().clear();
+    }
+
     private void createBouncers() {
-        bouncerGroup.getChildren().add(new Bouncer());
+        Bouncer b = new Bouncer();
+        resetBouncer(b);
+        bouncerGroup.getChildren().add(b);
     }
 
     private void createBricks() {
         System.out.println("STARTING LEVEL: " + LEVEL);
+        createBouncers();
+        LIVES_AT_LEVEL_START = LIVES_LEFT;
         double[] wallBounds = getWallBounds();
         double paddleBound = getPaddleBound();
         BRICK_FIELD_TEXT = "resources/level_" + LEVEL + ".txt";
@@ -200,7 +216,7 @@ public class Game extends Application {
     }
 
     private void displayLives() {
-        System.out.println("Lives: " + LIVES_LEFT);
+        System.out.println("LIVES: " + LIVES_LEFT);
     }
 
     // TODO: Implement out of bounds detection
@@ -224,6 +240,7 @@ public class Game extends Application {
         if (brickGroup.getChildren().isEmpty()) {
             System.out.println("LEVEL " + LEVEL + " CLEARED!!");
             LEVEL ++;
+            clearBouncers();
             createBricks();
         }
     }
@@ -243,17 +260,17 @@ public class Game extends Application {
         for (Node n1: bouncerGroup.getChildren()) {
             if (n1 instanceof Bouncer) {
                 Bouncer b = (Bouncer) n1;
-                testPaddleCollision(b);
+                Collision.testPaddleCollision(b, myPaddle);
                 for (Node n2: wallGroup.getChildren()) {
                     if (n2 instanceof Wall) {
                         Wall w = (Wall) n2;
-                        testWallCollision(b, w);
+                        Collision.testWallCollision(b, w);
                     }
                 }
                 for (Node n3: brickGroup.getChildren()) {
                     if (n3 instanceof Brick) {
                         Brick k = (Brick) n3;
-                        if (testBrickCollision(b, k)) {
+                        if (Collision.testBrickCollision(b, k)) {
                             destroyedBricks.add(n3);
                         }
                     }
@@ -264,75 +281,12 @@ public class Game extends Application {
         }
     }
 
-    private boolean testBrickCollision(Bouncer b, Brick k) {
-        double[] redirect = checkRectangleBouncerCollision(k, b);
-        if (redirect[0] != 0) {
-            if (k.getBrickPower() > 0) {
-                basicDeflect(redirect, b);
-                if (k.hitBrick(b.getBouncerDamage())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private void testWallCollision(Bouncer b, Wall w) {
-        double[] redirect = checkRectangleBouncerCollision(w, b);
-        if (redirect[0] != 0) {
-            basicDeflect(redirect, b);
-        }
-    }
-
-    private void testPaddleCollision(Bouncer b) {
-        if (shapeCollision(b, myPaddle)) {
-            angleDeflect(b, myPaddle);
-        }
-    }
-
     private void clearBricks(Collection<Node> destroyedBricks) {
         if (!destroyedBricks.isEmpty()) {
             for (Node n: destroyedBricks) {
                 brickGroup.getChildren().remove(n);
             }
         }
-    }
-
-    private void basicDeflect(double[] redirect, Bouncer b) {
-        double scale = redirect[0]; double shift = redirect[1];
-        b.setBouncerTheta(b.getBouncerTheta() * scale + shift);
-    }
-
-    private double[] checkRectangleBouncerCollision(Rectangle r, Circle c) {
-        double[] redirect = new double[2];
-        if (checkTopBottomCollision(r, c)) {
-            redirect[0] = -1; redirect[1] = 0;
-        } else if (checkLeftRightCollision(r, c)) {
-            redirect[0] = -1; redirect[1] = Math.PI;
-        }
-        return redirect;
-    }
-
-    private boolean checkTopBottomCollision(Rectangle r, Circle c) {
-        return r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX(), c.getBoundsInLocal().getCenterY() + c.getRadius()) ||
-                r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX(), c.getBoundsInLocal().getCenterY() - c.getRadius());
-    }
-
-    private boolean checkLeftRightCollision(Rectangle r, Circle c) {
-        return r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX() + c.getRadius(), c.getBoundsInLocal().getCenterY()) ||
-                r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX() - c.getRadius(), c.getBoundsInLocal().getCenterY());
-    }
-
-    private void angleDeflect(Bouncer b, Paddle p) {
-        double paddleX = p.getX();
-        double bouncerX = b.getCenterX();
-        double paddleWidth = p.getWidth();
-        double paddleCenter = paddleX + paddleWidth / 2;
-        b.setBouncerTheta(- Math.PI / 2 + 2 * (bouncerX - paddleCenter) * (p.getPaddleEdge() / paddleWidth));
-    }
-
-    private boolean shapeCollision(Shape s1, Shape s2) {
-        return Shape.intersect(s1, s2).getBoundsInLocal().getWidth() != -1;
     }
 
     private void moveBouncers(double elapsedTime) {
@@ -379,7 +333,26 @@ public class Game extends Application {
         } else if (code == KeyCode.L) {
             LIVES_LEFT ++;
             displayLives();
+        } else if (code == KeyCode.R) {
+            restartLevel();
+        } else if (code == KeyCode.SOFTKEY_2) {
+            jumpToLevel(2);
+        } else if (code == KeyCode.SOFTKEY_3) {
+            jumpToLevel(3);
         }
+    }
+
+    private void jumpToLevel(int level) {
+        LEVEL = level;
+        restartLevel();
+    }
+
+    private void restartLevel() {
+        LIVES_LEFT = LIVES_AT_LEVEL_START;
+        System.out.println("RESTARTING LEVEL!!");
+        createBricks();
+        clearBouncers();
+        createBouncers();
     }
 
     public Collection<Brick> createAllBricks(double[] wallBounds, double paddleBound, String brickFieldText) {
