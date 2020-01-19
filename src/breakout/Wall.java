@@ -29,12 +29,11 @@ public class Wall extends Rectangle {
     }
 
     // ensure no overlap, use wall positional data to create bounds for brick construction
-    // TODO: segment wall creation into specific sides (ok to do here b/c segmented)
-    public static Collection<Wall> createAllWalls() {
+    public static Collection<Wall> createAllWalls(int width, int height) {
         Collection<Wall> allWalls = new ArrayList<Wall>();
-        allWalls.add(new Wall(WALL_FLOAT, WALL_FLOAT + WALL_WIDTH, WALL_WIDTH, Game.SCREEN_HEIGHT - (WALL_FLOAT + WALL_WIDTH), "LEFT"));
-        allWalls.add(new Wall(Game.SCREEN_WIDTH - WALL_FLOAT - WALL_WIDTH, WALL_FLOAT + WALL_WIDTH, WALL_WIDTH, Game.SCREEN_HEIGHT - (WALL_FLOAT + WALL_WIDTH), "RIGHT"));
-        allWalls.add(new Wall(WALL_FLOAT, WALL_FLOAT, Game.SCREEN_WIDTH - 2 * WALL_FLOAT, WALL_WIDTH, "TOP"));
+        allWalls.add(new Wall(WALL_FLOAT, WALL_FLOAT + WALL_WIDTH, WALL_WIDTH, height - (WALL_FLOAT + WALL_WIDTH), "LEFT"));
+        allWalls.add(new Wall(width - WALL_FLOAT - WALL_WIDTH, WALL_FLOAT + WALL_WIDTH, WALL_WIDTH, height - (WALL_FLOAT + WALL_WIDTH), "RIGHT"));
+        allWalls.add(new Wall(WALL_FLOAT, WALL_FLOAT, width - 2 * WALL_FLOAT, WALL_WIDTH, "TOP"));
         return allWalls;
     }
 

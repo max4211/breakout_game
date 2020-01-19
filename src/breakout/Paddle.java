@@ -26,6 +26,10 @@ public class Paddle extends Rectangle {
         this.setFill(PADDLE_COLOR);
     }
 
+    public double getPaddleBound() {
+        return this.getBoundsInLocal().getMinY();
+    }
+
     public int getPaddleSpeed() {
         return PADDLE_SPEED;
     }

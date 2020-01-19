@@ -41,6 +41,18 @@ public class Bouncer extends Circle {
         BOUNCER_SPEED = speed;
     }
 
+    public void move(double elapsedTime) {
+        this.setCenterY(this.getCenterY() + this.getBouncerSpeed() * elapsedTime * Math.sin(this.getBouncerTheta()));
+        this.setCenterX(this.getCenterX() + this.getBouncerSpeed() * elapsedTime * Math.cos(this.getBouncerTheta()));
+    }
+
+    public void stickBouncerOnPaddle(Paddle p) {
+        this.setCenterX(p.getX() + p.getWidth() / 2);
+        this.setCenterY(p.getY() - this.getRadius());
+        this.setBouncerStuck(true);
+        this.setBouncerSpeed(0);
+    }
+
     public void toggleBouncerStuck() {
         BOUNCER_STUCK = !(BOUNCER_STUCK);
     }
