@@ -113,7 +113,7 @@ public class Game extends Application {
         scanRoot(root);
 
         // create a place to see the shapes and respond to input
-        Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
+        Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT, BACKGROUND);
         // Scene scene = new Scene(root);
         scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
         return scene;
@@ -196,7 +196,7 @@ public class Game extends Application {
         for (int i = 0; i < dataSplit.length; i ++) {
             int power = Integer.parseInt(dataSplit[i]);
             if (power > 0) {
-                brickList.add(new Brick(BRICK_START_X + (BRICK_WIDTH * (i+1)), BRICK_START_Y + (BRICK_HEIGHT * brickRow), BRICK_WIDTH, BRICK_HEIGHT, power));
+                brickList.add(new Brick(BRICK_START_X + (BRICK_WIDTH * i), BRICK_START_Y + (BRICK_HEIGHT * brickRow), BRICK_WIDTH, BRICK_HEIGHT, power));
             }
         }
         return brickList;
