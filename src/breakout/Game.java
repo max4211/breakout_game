@@ -86,7 +86,7 @@ public class Game extends Application {
         root = addToRoot(root, bouncerGroup);
         root = addToRoot(root, brickGroup);
 
-        resetBouncer();
+        resetBouncer((Bouncer) bouncerGroup.getChildren().get(0));
 
         // create a place to see the shapes and respond to input
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -101,7 +101,7 @@ public class Game extends Application {
         // update "actors" attributes
         moveBouncers(elapsedTime);
         collisionDetection();
-        // outOfBoundsDetection();
+        outOfBoundsDetection();
     }
 
     private Group addToRoot(Group root, Group addMe) {
@@ -154,21 +154,37 @@ public class Game extends Application {
         return wallBounds;
     }
 
-    private void resetBouncer() {
-        for (Node n: bouncerGroup.getChildren()) {
-            if (n instanceof Bouncer) {
-                Bouncer b = (Bouncer) n;
-                b.setCenterX(myPaddle.getX() + myPaddle.getWidth() / 2);
-                b.setCenterY(myPaddle.getY() - b.getRadius());
-                b.setBouncerStuck(true);
-                b.setBouncerSpeed(0);
-            }
-        }
+    private void resetBouncer(Bouncer b) {
+        b.setCenterX(myPaddle.getX() + myPaddle.getWidth() / 2);
+        b.setCenterY(myPaddle.getY() - b.getRadius());
+        b.setBouncerStuck(true);
+        b.setBouncerSpeed(0);
     }
 
     // TODO: Implement out of bounds detection
     private void outOfBoundsDetection() {
+        for (Node n: bouncerGroup.getChildren()) {
+            if (n instanceof Bouncer) {
+                Bouncer b = (Bouncer) n;
+                if (b.getCenterY() > SCREEN_HEIGHT) {
+                    LIVES_LEFT --;
+                    if (checkLives()) {
+                        resetBouncer(b);
+                    } else {
+                        gameOver();
+                    }
+                }
+            }
+        }
+    }
 
+    private boolean checkLives() {
+        return (LIVES_LEFT > 0);
+    }
+
+    private void gameOver() {
+        System.out.println("GAME OVER!!");
+        System.exit(0);
     }
 
     private void collisionDetection() {
