@@ -23,10 +23,10 @@ public class Paddle extends Rectangle {
     // Constructors
     public Paddle(int width, int height) {
         myPaddle = new Rectangle();
-        myPaddle.setX(width / 2 - myPaddle.getBoundsInLocal().getWidth() / 2);
-        myPaddle.setY(height - myPaddle.getBoundsInLocal().getHeight() / 2 - PADDLE_FLOAT);
         myPaddle.setWidth(PADDLE_WIDTH);
         myPaddle.setHeight(PADDLE_HEIGHT);
+        myPaddle.setX(width / 2 - myPaddle.getBoundsInLocal().getWidth() / 2);
+        myPaddle.setY(height - myPaddle.getBoundsInLocal().getHeight() / 2 - PADDLE_FLOAT);
         myPaddle.setFill(PADDLE_COLOR);
     }
 
