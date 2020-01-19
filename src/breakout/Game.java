@@ -1,6 +1,7 @@
 package breakout;
 
 import javafx.application.Application;
+import javafx.scene.Node;
 import javafx.stage.Stage;
 
 import javafx.animation.KeyFrame;
@@ -17,6 +18,7 @@ import javafx.util.Duration;
 import java.lang.Math.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Main game engine to process game rules, calls additional classes
@@ -24,22 +26,33 @@ import java.util.Collection;
  */
 public class Game extends Application {
     // Game metadata
-    public static final String TITLE = "Breakout Game JavaFX";
+    private static final String TITLE = "Breakout Game JavaFX";
+
+    // TODO: Update to private
     public static final int SCREEN_WIDTH = 400;
     public static final int SCREEN_HEIGHT = 400;
-    public static int LIVES_LEFT = 3;
+    private static int LIVES_LEFT = 3;
 
+    // Game play metadata
     private static final int FRAMES_PER_SECOND = 120;
     private static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     private static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
     private static final Paint BACKGROUND = Color.AZURE;
+
+    // Testing  brick creation
+    private static final String BRICK_FIELD_TEXT = "resources/level_test.txt";
 
     // some things needed to remember during the game
     private Scene myScene;
     private Paddle myPaddle;
     private Collection<Wall> allWalls = new ArrayList<Wall>();
     private Collection<Bouncer> allBouncers = new ArrayList<Bouncer>();
-    private Collection<Brick> allBricks = new ArrayList<Brick>();
+    private Collection<Brick> allBricks = new CopyOnWriteArrayList<>();
+
+    // TODO: Updating elements to become groups
+    private Group wallGroup = new Group();
+    private Group bouncerGroup = new Group();
+    private Group brickGroup = new Group();
 
     /**
      * Initialize what will be displayed and how it will be updated.
@@ -68,12 +81,14 @@ public class Game extends Application {
         createPaddle();
         createAllWalls();
         createBouncers();
-        createBricks();
+        // createBricks();
 
-        // add shapes of items to root
         root = addPaddleToRoot(root);
-        root = addWallsToRoot(root);
-        root = addBouncersToRoot(root);
+        root = addToRoot(root, wallGroup);
+        root = addToRoot(root, bouncerGroup);
+        // root = addToRoot(root, brickGroup);
+
+        resetBouncer();
 
         // create a place to see the shapes and respond to input
         Scene scene = new Scene(root);
@@ -81,29 +96,23 @@ public class Game extends Application {
         return scene;
     }
 
-    private void createBricks() {
-        double[] wallBounds = getWallBounds();
-        double paddleBound = getPaddleBound();
 
+    // Change properties of shapes in small ways to animate them over time
+    private void step (double elapsedTime) {
+        // update "actors" attributes
+        // moveBouncers(elapsedTime);
+        // collisionDetection();
+        // outOfBoundsDetection();
     }
 
-    private double getPaddleBound() {
-        return myPaddle.getBoundsInLocal().getMinY();
+    private Group addToRoot(Group root, Group addMe) {
+        root.getChildren().add(addMe);
+        return root;
     }
 
-    // int: {left_bound, right_bound, top_bound}
-    private double[] getWallBounds() {
-        double[] wallBounds = new double[3];
-        for (Wall w: allWalls) {
-            if (w.getMyName().equals("LEFT")) {
-                wallBounds[0] = w.getMyWall().getBoundsInLocal().getMaxX();
-            } else if (w.getMyName().equals("RIGHT")) {
-                wallBounds[1] = w.getMyWall().getBoundsInLocal().getMinX();
-            } else if (w.getMyName().equals("TOP")) {
-                wallBounds[2] = w.getMyWall().getBoundsInLocal().getMaxY();
-            }
-        }
-        return wallBounds;
+    private Group addPaddleToRoot(Group root) {
+        root.getChildren().add(myPaddle.getMyPaddle());
+        return root;
     }
 
     private void createPaddle() {
@@ -112,41 +121,55 @@ public class Game extends Application {
 
     private void createAllWalls() {
         allWalls = Wall.createAllWalls();
+        for (Wall w: allWalls) {wallGroup.getChildren().add(w.getMyWall());}
     }
 
     private void createBouncers() {
         allBouncers.add(new Bouncer());
+        bouncerGroup.getChildren().add(new Bouncer().getMyBouncer());
     }
 
-    private Rectangle createRectangle(int x, int y, int width, int height) {
-        return new Rectangle (x, y, width, height);
+    private void createBricks() {
+        double[] wallBounds = getWallBounds();
+        double paddleBound = getPaddleBound();
+        allBricks.addAll(Brick.createAllBricks(wallBounds, paddleBound, BRICK_FIELD_TEXT));
+        for (Brick k: allBricks) {brickGroup.getChildren().add(k);}
     }
 
-    // TODO: Refactor shape addition
-    private Group addPaddleToRoot(Group root) {
-        root.getChildren().add(myPaddle.getMyPaddle());
-        return root;
+    private double getPaddleBound() {
+        return myPaddle.getMyPaddle().getBoundsInLocal().getMinY();
     }
 
-    private Group addWallsToRoot(Group root) {
-        for (Wall w: allWalls) { root.getChildren().add(w.getMyWall()); }
-        return root;
-    }
-
-    private Group addBouncersToRoot(Group root) {
-        for (Bouncer b: allBouncers) {
-            setBouncerOnPaddle(b, myPaddle);
-            root.getChildren().add(b.getMyBouncer());
+    // int: {left_bound, right_bound, top_bound}
+    private double[] getWallBounds() {
+        double[] wallBounds = new double[3];
+        for (Node n: wallGroup.getChildren()) {
+            if (n instanceof Wall) {
+                Wall w = (Wall) n;
+                if (w.getMyName().equals("LEFT")) {
+                    wallBounds[0] = w.getMyWall().getBoundsInLocal().getMaxX();
+                } else if (w.getMyName().equals("RIGHT")) {
+                    wallBounds[1] = w.getMyWall().getBoundsInLocal().getMinX();
+                } else if (w.getMyName().equals("TOP")) {
+                    wallBounds[2] = w.getMyWall().getBoundsInLocal().getMaxY();
+                }
+            }
         }
-        return root;
+        return wallBounds;
     }
 
-    // Change properties of shapes in small ways to animate them over time
-    private void step (double elapsedTime) {
-        // update "actors" attributes
-        moveBouncers(elapsedTime);
-        collisionDetection();
-        outOfBoundsDetection();
+    private void resetBouncer() {
+        for (Node n: bouncerGroup.getChildren()) {
+            System.out.println("bouncerGroup node class: " + n.getClass());
+            if (n instanceof Circle) {
+                System.out.println("node instance of bouncer, setting on paddle");
+                Circle c = (Circle) n;
+                c.setCenterX(myPaddle.getMyPaddle().getX() + myPaddle.getMyPaddle().getWidth() / 2);
+                c.setCenterY(myPaddle.getMyPaddle().getY() - c.getRadius());
+                // b.setBouncerStuck(true);
+                // b.setBouncerSpeed(0);
+            }
+        }
     }
 
     // TODO: Implement out of bounds detection
@@ -166,12 +189,19 @@ public class Game extends Application {
                     basicDeflect(redirect, b);
                 }
             }
+            for (Brick k: allBricks) {
+                redirect = checkRectangleBouncerCollision(k.getMyBrick(), b.getMyBouncer());
+                if (redirect[0] != 0) {
+                    basicDeflect(redirect, b);
+                    k.hitBrick(b.getBouncerDamage());
+                }
+            }
         }
     }
 
     private void basicDeflect(double[] redirect, Bouncer b) {
         double scale = redirect[0]; double shift = redirect[1];
-        b.BOUNCER_THETA = b.BOUNCER_THETA * scale + shift;
+        b.setBouncerTheta(b.getBouncerTheta() * scale + shift);
     }
 
     private double[] checkRectangleBouncerCollision(Rectangle r, Circle c) {
@@ -183,7 +213,6 @@ public class Game extends Application {
         } else if (checkLeftCollision(r, c)) {
             redirect[0] = -1; redirect[1] = Math.PI;
         } else if (checkTopCollision(r, c)){
-            // TODO: Verify this is correct
             redirect[0] = -1; redirect[1] = 0;
         }
         return redirect;
@@ -216,41 +245,40 @@ public class Game extends Application {
         double bouncerX = b.getMyBouncer().getCenterX();
         double paddleWidth = p.getMyPaddle().getWidth();
         double paddleCenter = paddleX + paddleWidth / 2;
-        b.setBouncerTheta(- Math.PI / 2 + 2 * (bouncerX - paddleCenter) * (p.PADDLE_EDGE / paddleWidth));
+        b.setBouncerTheta(- Math.PI / 2 + 2 * (bouncerX - paddleCenter) * (p.getPaddleEdge() / paddleWidth));
     }
 
     private boolean shapeCollision(Shape s1, Shape s2) {
         return Shape.intersect(s1, s2).getBoundsInLocal().getWidth() != -1;
     }
 
-    private void setBouncerOnPaddle(Bouncer b, Paddle p) {
-        b.getMyBouncer().setCenterX(p.getMyPaddle().getX() + p.getMyPaddle().getWidth() / 2);
-        b.getMyBouncer().setCenterY(p.getMyPaddle().getY() - b.getMyBouncer().getRadius());
-        b.setBouncerStuck(true);
-        b.setBouncerSpeed(0);
-    }
-
     private void moveBouncers(double elapsedTime) {
-        for (Bouncer b: allBouncers) {
-            b.getMyBouncer().setCenterY(b.getMyBouncer().getCenterY() + b.getBouncerSpeed() * elapsedTime * Math.sin(b.getBouncerTheta()));
-            b.getMyBouncer().setCenterX(b.getMyBouncer().getCenterX() + b.getBouncerSpeed() * elapsedTime * Math.cos(b.getBouncerTheta()));
+        for (Node n: bouncerGroup.getChildren()) {
+            if (n instanceof Bouncer) {
+                Bouncer b = (Bouncer) n;
+                b.getMyBouncer().setCenterY(b.getMyBouncer().getCenterY() + b.getBouncerSpeed() * elapsedTime * Math.sin(b.getBouncerTheta()));
+                b.getMyBouncer().setCenterX(b.getMyBouncer().getCenterX() + b.getBouncerSpeed() * elapsedTime * Math.cos(b.getBouncerTheta()));
+            }
         }
     }
 
     private void sideKeyPress(int direct) {
-        myPaddle.getMyPaddle().setX(myPaddle.getMyPaddle().getX() + direct * myPaddle.PADDLE_SPEED);
-        for (Bouncer b: allBouncers ) {
-            if (b.BOUNCER_STUCK) {
-                b.getMyBouncer().setCenterX(b.getMyBouncer().getCenterX() + direct * myPaddle.PADDLE_SPEED);
+        myPaddle.getMyPaddle().setX(myPaddle.getMyPaddle().getX() + direct * myPaddle.getPaddleSpeed());
+        for (Node n: bouncerGroup.getChildren()) {
+            if (n instanceof Circle) {
+                Circle c = (Circle) n;
+                if (true) {
+                    c.setCenterX(c.getCenterX() + direct * myPaddle.getPaddleSpeed());
+                }
             }
         }
     }
 
     private void spaceKeyPress() {
         for (Bouncer b: allBouncers ) {
-            if (b.BOUNCER_STUCK) {
+            if (b.getBouncerStuck()) {
                 b.setBouncerStuck(false);
-                b.setBouncerSpeed(b.BOUNCER_NORMAL_SPEED);
+                b.setBouncerSpeed(b.getBouncerNormalSpeed());
             }
         }
     }

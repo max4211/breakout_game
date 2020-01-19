@@ -12,15 +12,15 @@ public class LevelGenerator {
 
     // Vars private to this class
     private static final int BRICKS_PER_ROW = 10;
-    private static final int ROWS_OF_BRICKS = 1;
+    private static final int ROWS_OF_BRICKS = 3;
     private static String SEPARATOR = " ";
 
     // TODO: Incorporate side padding to level construction
     public static void createLevel() throws FileNotFoundException {
         PrintWriter writer = new PrintWriter(FILE_NAME);
         int brick; int localPad;
-        printInt(BRICKS_PER_ROW, writer, true);
-        printInt(ROWS_OF_BRICKS, writer, true);
+        printInt("BRICKS_PER_ROW" + SEPARATOR + BRICKS_PER_ROW, writer, true);
+        printInt("ROWS_OF_BRICKS" + SEPARATOR + ROWS_OF_BRICKS, writer, true);
         for (int i = 0; i < ROWS_OF_BRICKS; i ++) {
             localPad = 0;
             for (int j = 0; j < BRICKS_PER_ROW; j ++) {
@@ -30,7 +30,7 @@ public class LevelGenerator {
                 } else {
                     brick = 0;
                 }
-                printInt(brick, writer, false);
+                printInt(Integer.toString(brick), writer, false);
             }
             System.out.println();
             writer.println();
@@ -38,13 +38,13 @@ public class LevelGenerator {
         writer.close();
     }
 
-    private static void printInt(int i, PrintWriter w, boolean newLine) {
+    private static void printInt(String s, PrintWriter w, boolean newLine) {
         if (newLine) {
-            System.out.println(i);
-            w.println(i);
+            System.out.println(s);
+            w.println(s);
         } else {
-            System.out.print(i + SEPARATOR);
-            w.print(i + SEPARATOR);
+            System.out.print(s + SEPARATOR);
+            w.print(s + SEPARATOR);
         }
 
     }

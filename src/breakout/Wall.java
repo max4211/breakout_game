@@ -4,11 +4,12 @@ import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Wall extends Node {
+public class Wall extends Rectangle {
 
     private Rectangle myWall;
     private String myName;
