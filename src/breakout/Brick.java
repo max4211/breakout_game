@@ -19,7 +19,6 @@ public class Brick extends Rectangle {
 
     // Brick constant metadata
     private static final double BRICK_STROKE_WIDTH = 0.05;
-    private static Paint BRICK_STROKE_COLOR = Color.BLACK;
 
     // Brick metadata read from file
     private static int BRICKS_PER_ROW;
@@ -35,20 +34,19 @@ public class Brick extends Rectangle {
 
     // dynamic variables to update based on brick collisions
     private static int BRICK_POWER;
-    private static Paint BRICK_COLOR = Color.RED;
 
     // Brick padding (as percent values)
-    private static final double BRICK_TOP_PAD = 0.25;
-    private static final double BRICK_BOTTOM_PAD = 0.40;
+    private static final double BRICK_TOP_PAD = 0.30;
+    private static final double BRICK_BOTTOM_PAD = 0.30;
     private static final double BRICK_RIGHT_PAD = 0.15;
     private static final double BRICK_LEFT_PAD = 0.15;
 
     public Brick(double x, double y, int power) {
         super(x, y, BRICK_WIDTH, BRICK_HEIGHT);
         BRICK_POWER = power;
-        this.setFill(BRICK_COLOR);
+        this.setFill(Color.RED);
         this.setStrokeWidth(this.getWidth() * BRICK_STROKE_WIDTH);
-        this.setStroke(BRICK_STROKE_COLOR);
+        this.setStroke(Color.BLACK);
     }
 
     public int getBrickPower() {
@@ -66,7 +64,12 @@ public class Brick extends Rectangle {
     }
 
     public void updateBrickColor() {
-        BRICK_COLOR = Color.BLUE;
+        if (BRICK_POWER < 1) {
+            this.setFill(Color.TRANSPARENT);
+            this.setStroke(Color.TRANSPARENT);
+        } else {
+            this.setFill(Color.BLUE);
+        }
     }
 
     public static Collection<Brick> createAllBricks(double[] wallBounds, double paddleBound, String brickFieldText) {

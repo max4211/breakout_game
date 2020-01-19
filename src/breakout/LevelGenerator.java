@@ -7,8 +7,8 @@ public class LevelGenerator {
 
     // Vars visible to external devices
     public static String FILE_NAME = "resources/level_test.txt";
-    public static final int SIDE_PAD = 3;     // maintain less than 1/2 of BRICKS_PER_ROW
-    public static int LEVEL_DIFFICULTY = 1;
+    public static final int SIDE_PAD = 2;     // maintain less than 1/2 of BRICKS_PER_ROW
+    public static int LEVEL_DIFFICULTY = 3;
 
     // Vars private to this class
     private static final int BRICKS_PER_ROW = 10;

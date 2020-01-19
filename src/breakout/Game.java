@@ -16,6 +16,9 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.util.Duration;
 import java.lang.Math.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Main game engine to process game rules, calls additional classes
@@ -153,9 +156,7 @@ public class Game extends Application {
 
     private void resetBouncer() {
         for (Node n: bouncerGroup.getChildren()) {
-            System.out.println("bouncerGroup node class: " + n.getClass());
             if (n instanceof Bouncer) {
-                System.out.println("node instance of bouncer, setting on paddle");
                 Bouncer b = (Bouncer) n;
                 b.setCenterX(myPaddle.getX() + myPaddle.getWidth() / 2);
                 b.setCenterY(myPaddle.getY() - b.getRadius());
@@ -171,7 +172,8 @@ public class Game extends Application {
     }
 
     private void collisionDetection() {
-        double[] redirect = new double[2];
+        double[] redirect;
+        Collection<Node> destroyedBricks = new ArrayList<Node>();
         for (Node n1: bouncerGroup.getChildren()) {
             if (n1 instanceof Bouncer) {
                 Bouncer b = (Bouncer) n1;
@@ -184,6 +186,7 @@ public class Game extends Application {
                         redirect = checkRectangleBouncerCollision(w, b);
                         if (redirect[0] != 0) {
                             basicDeflect(redirect, b);
+                            redirect = new double[2];
                         }
                     }
                 }
@@ -191,14 +194,27 @@ public class Game extends Application {
                     if (n3 instanceof Brick) {
                         Brick k = (Brick) n3;
                         redirect = checkRectangleBouncerCollision(k, b);
-                        if (redirect[0] != 0) {
+                        if (redirect[0] != 0 && k.getBrickPower() > 0) {
                             basicDeflect(redirect, b);
+                            redirect = new double[2];
                             if (k.hitBrick(b.getBouncerDamage())) {
-                                brickGroup.getChildren().remove(n3);
+                                System.out.println("adding brick to destroyed list");
+                                destroyedBricks.add(n3);
                             }
                         }
                     }
                 }
+                clearBricks(destroyedBricks);
+                destroyedBricks.clear();
+            }
+        }
+    }
+
+    private void clearBricks(Collection<Node> destroyedBricks) {
+        if (!destroyedBricks.isEmpty()) {
+            System.out.println("clearing bricks");
+            for (Node n: destroyedBricks) {
+                brickGroup.getChildren().remove(n);
             }
         }
     }
