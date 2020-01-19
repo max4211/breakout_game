@@ -141,7 +141,7 @@ public class Game extends Application {
     private void step (double elapsedTime) {
         // update "actors" attributes
         moveBouncers(elapsedTime);
-        collisionDetection();
+        Collision.collisionDetection(bouncerGroup, brickGroup,  wallGroup, myPaddle);
         outOfBoundsDetection();
         checkLevelClear();
     }
@@ -252,41 +252,6 @@ public class Game extends Application {
     private void gameOver() {
         System.out.println("GAME OVER!!");
         System.exit(0);
-    }
-
-    // TODO: Refactor collision detection
-    private void collisionDetection() {
-        Collection<Node> destroyedBricks = new ArrayList<Node>();
-        for (Node n1: bouncerGroup.getChildren()) {
-            if (n1 instanceof Bouncer) {
-                Bouncer b = (Bouncer) n1;
-                Collision.testPaddleCollision(b, myPaddle);
-                for (Node n2: wallGroup.getChildren()) {
-                    if (n2 instanceof Wall) {
-                        Wall w = (Wall) n2;
-                        Collision.testWallCollision(b, w);
-                    }
-                }
-                for (Node n3: brickGroup.getChildren()) {
-                    if (n3 instanceof Brick) {
-                        Brick k = (Brick) n3;
-                        if (Collision.testBrickCollision(b, k)) {
-                            destroyedBricks.add(n3);
-                        }
-                    }
-                }
-                clearBricks(destroyedBricks);
-                destroyedBricks.clear();
-            }
-        }
-    }
-
-    private void clearBricks(Collection<Node> destroyedBricks) {
-        if (!destroyedBricks.isEmpty()) {
-            for (Node n: destroyedBricks) {
-                brickGroup.getChildren().remove(n);
-            }
-        }
     }
 
     private void moveBouncers(double elapsedTime) {

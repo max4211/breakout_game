@@ -1,45 +1,81 @@
 package breakout;
 
+import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public class Collision {
 
-    public static boolean checkTopBottomCollision(Rectangle r, Circle c) {
+    public static void collisionDetection(Group bouncerGroup, Group brickGroup, Group wallGroup, Paddle myPaddle) {
+        Collection<Node> destroyedBricks = new ArrayList<Node>();
+        for (Node n1: bouncerGroup.getChildren()) {
+            if (n1 instanceof Bouncer) {
+                Bouncer b = (Bouncer) n1;
+                testPaddleCollision(b, myPaddle);
+                for (Node n2: wallGroup.getChildren()) {
+                    if (n2 instanceof Wall) {
+                        Wall w = (Wall) n2;
+                        testWallCollision(b, w);
+                    }
+                }
+                for (Node n3: brickGroup.getChildren()) {
+                    if (n3 instanceof Brick) {
+                        Brick k = (Brick) n3;
+                        if (testBrickCollision(b, k)) {
+                            destroyedBricks.add(n3);
+                        }
+                    }
+                }
+                clearBricks(destroyedBricks, brickGroup);
+                destroyedBricks.clear();
+            }
+        }
+    }
+
+    private static void clearBricks(Collection<Node> destroyedBricks, Group brickGroup) {
+        if (!destroyedBricks.isEmpty()) {
+            for (Node n: destroyedBricks) {
+                brickGroup.getChildren().remove(n);
+            }
+        }
+    }
+
+    private static boolean checkTopBottomCollision(Rectangle r, Circle c) {
         return r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX(), c.getBoundsInLocal().getCenterY() + c.getRadius()) ||
                 r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX(), c.getBoundsInLocal().getCenterY() - c.getRadius());
     }
 
-    public static boolean checkLeftRightCollision(Rectangle r, Circle c) {
+    private static boolean checkLeftRightCollision(Rectangle r, Circle c) {
         return r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX() + c.getRadius(), c.getBoundsInLocal().getCenterY()) ||
                 r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX() - c.getRadius(), c.getBoundsInLocal().getCenterY());
     }
 
-    public static boolean shapeCollision(Shape s1, Shape s2) {
+    private static boolean shapeCollision(Shape s1, Shape s2) {
         return Shape.intersect(s1, s2).getBoundsInLocal().getWidth() != -1;
     }
 
-    public static void basicDeflect(double[] redirect, Bouncer b) {
-        double scale = redirect[0]; double shift = redirect[1];
-        b.setBouncerTheta(b.getBouncerTheta() * scale + shift);
-    }
-
-    public static double[] checkRectangleBouncerCollision(Rectangle r, Circle c) {
+    private static double[] checkRectangleBouncerCollision(Rectangle r, Circle c) {
         double[] redirect = new double[2];
-        if (Collision.checkTopBottomCollision(r, c)) {
+        if (checkTopBottomCollision(r, c)) {
             redirect[0] = -1; redirect[1] = 0;
-        } else if (Collision.checkLeftRightCollision(r, c)) {
+        } else if (checkLeftRightCollision(r, c)) {
             redirect[0] = -1; redirect[1] = Math.PI;
         }
         return redirect;
     }
 
-    public static boolean testBrickCollision(Bouncer b, Brick k) {
+    private static boolean testBrickCollision(Bouncer b, Brick k) {
         double[] redirect = checkRectangleBouncerCollision(k, b);
         if (redirect[0] != 0) {
             if (k.getBrickPower() > 0) {
-                Collision.basicDeflect(redirect, b);
+                System.out.println("FOUND BRICK COLLISION");
+                System.out.println("scale: " + redirect[0] + ", shift: " + redirect[1]);
+                basicDeflect(redirect, b);
                 if (k.hitBrick(b.getBouncerDamage())) {
                     return true;
                 }
@@ -48,18 +84,24 @@ public class Collision {
         return false;
     }
 
-    public static void testWallCollision(Bouncer b, Wall w) {
+    private static void testWallCollision(Bouncer b, Wall w) {
         double[] redirect = checkRectangleBouncerCollision(w, b);
         if (redirect[0] != 0) {
             System.out.println("FOUND WALL COLLISION");
-            Collision.basicDeflect(redirect, b);
+            System.out.println("scale: " + redirect[0] + ", shift: " + redirect[1]);
+            basicDeflect(redirect, b);
         }
     }
 
-    public static void testPaddleCollision(Bouncer b, Paddle p) {
+    private static void testPaddleCollision(Bouncer b, Paddle p) {
         if (Collision.shapeCollision(b, p)) {
             angleDeflect(b, p);
         }
+    }
+
+    private static void basicDeflect(double[] redirect, Bouncer b) {
+        double scale = redirect[0]; double shift = redirect[1];
+        b.setBouncerTheta(b.getBouncerTheta() * scale + shift);
     }
 
     private static void angleDeflect(Bouncer b, Paddle p) {

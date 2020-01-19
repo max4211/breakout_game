@@ -6,6 +6,8 @@
 - Update level
 
 #### Next steps
+- Fix wall collisions
+- Refactor brick code from game class
 - Incorporate UI View for prints
 - Add power ups
     - multiple bouncers
