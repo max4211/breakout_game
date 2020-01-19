@@ -249,38 +249,22 @@ public class Game extends Application {
 
     private double[] checkRectangleBouncerCollision(Rectangle r, Circle c) {
         double[] redirect = new double[2];
-        if (checkBottomCollision(r, c)) {
+        if (checkTopBottomCollision(r, c)) {
             redirect[0] = -1; redirect[1] = 0;
-        } else if (checkRightCollision(r, c)) {
+        } else if (checkLeftRightCollision(r, c)) {
             redirect[0] = -1; redirect[1] = Math.PI;
-        } else if (checkLeftCollision(r, c)) {
-            redirect[0] = -1; redirect[1] = Math.PI;
-        } else if (checkTopCollision(r, c)){
-            redirect[0] = -1; redirect[1] = 0;
         }
         return redirect;
     }
 
-    // TODO: Implement refactored method (elastic) below - may want to keep b/c sides add good specificity
-    // IDEA: Could refactor based on top/bottom, left right (only things that matter for polar shift
-    private boolean checkElasticCollision(Rectangle r, Circle c, double xShift, double yShift) {
-        return r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX() + xShift, c.getBoundsInLocal().getCenterY() + yShift);
+    private boolean checkTopBottomCollision(Rectangle r, Circle c) {
+        return r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX(), c.getBoundsInLocal().getCenterY() + c.getRadius()) ||
+                r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX(), c.getBoundsInLocal().getCenterY() - c.getRadius());
     }
 
-    private boolean checkRightCollision(Rectangle r, Circle c) {
-        return r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX() + c.getRadius(), c.getBoundsInLocal().getCenterY());
-    }
-
-    private boolean checkLeftCollision(Rectangle r, Circle c) {
-        return r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX() - c.getRadius(), c.getBoundsInLocal().getCenterY());
-    }
-
-    private boolean checkTopCollision(Rectangle r, Circle c) {
-        return r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX(), c.getBoundsInLocal().getCenterY() + c.getRadius());
-    }
-
-    private boolean checkBottomCollision(Rectangle r, Circle c) {
-        return r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX(), c.getBoundsInLocal().getCenterY() - c.getRadius());
+    private boolean checkLeftRightCollision(Rectangle r, Circle c) {
+        return r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX() + c.getRadius(), c.getBoundsInLocal().getCenterY()) ||
+                r.getBoundsInLocal().contains(c.getBoundsInLocal().getCenterX() - c.getRadius(), c.getBoundsInLocal().getCenterY());
     }
 
     private void angleDeflect(Bouncer b, Paddle p) {
