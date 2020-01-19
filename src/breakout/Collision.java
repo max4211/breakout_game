@@ -31,16 +31,8 @@ public class Collision {
                         }
                     }
                 }
-                clearBricks(destroyedBricks, brickGroup);
+                Game.removeNodes(destroyedBricks, brickGroup);
                 destroyedBricks.clear();
-            }
-        }
-    }
-
-    private static void clearBricks(Collection<Node> destroyedBricks, Group brickGroup) {
-        if (!destroyedBricks.isEmpty()) {
-            for (Node n: destroyedBricks) {
-                brickGroup.getChildren().remove(n);
             }
         }
     }

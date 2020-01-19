@@ -1,5 +1,6 @@
 package breakout;
 
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -9,7 +10,7 @@ import javafx.scene.shape.Shape;
 public class Bouncer extends Circle {
 
     private static double BOUNCER_THETA = - Math.PI / 2;
-    private static int BOUNCER_NORMAL_SPEED = 240;
+    private static int BOUNCER_NORMAL_SPEED = 180;
     private static int BOUNCER_SPEED = BOUNCER_NORMAL_SPEED;
     private static int BOUNCER_RADIUS = 8;
     private static boolean BOUNCER_STUCK = false;
@@ -54,6 +55,10 @@ public class Bouncer extends Circle {
 
     public int getBouncerDamage() {
         return BOUNCER_DAMAGE;
+    }
+
+    public static void clearBouncers(Group bouncerGroup) {
+        bouncerGroup.getChildren().clear();
     }
 
 }

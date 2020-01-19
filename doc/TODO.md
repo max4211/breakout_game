@@ -6,7 +6,9 @@
 - Update level
 
 #### Next steps
-- Fix wall collisions
+- Fix theta adjustments
+- Verify wall collisions (adjust screen dimensions)
+- Fix paddle collisions
 - Refactor brick code from game class
 - Incorporate UI View for prints
 - Add power ups

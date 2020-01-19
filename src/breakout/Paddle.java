@@ -16,7 +16,7 @@ public class Paddle extends Rectangle {
 
     // Paddle data subject to change
     private static int PADDLE_WIDTH = 100;
-    private static int PADDLE_SPEED = 10;
+    private static int PADDLE_SPEED = 15;
 
     // Constructors
     public Paddle(int width, int height) {

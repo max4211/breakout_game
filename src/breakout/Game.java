@@ -42,7 +42,7 @@ public class Game extends Application {
     private int LEVEL = 1;
 
     // Game play metadata
-    private static final int FRAMES_PER_SECOND = 80;
+    private static final int FRAMES_PER_SECOND = 120;
     private static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     private static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
     private static final Paint BACKGROUND = Color.AZURE;
@@ -114,7 +114,7 @@ public class Game extends Application {
     private Group initializeRoot(Group root) {
         createPaddle();
         createAllWalls();
-        createBouncers();
+        createBouncer();
         createBricks();
 
         // root.getChildren().add(myPaddle);
@@ -143,7 +143,16 @@ public class Game extends Application {
         moveBouncers(elapsedTime);
         Collision.collisionDetection(bouncerGroup, brickGroup,  wallGroup, myPaddle);
         outOfBoundsDetection();
+        checkBouncersLeft();
         checkLevelClear();
+    }
+
+    public static void removeNodes(Collection<Node> destroyMe, Group group) {
+        if (!destroyMe.isEmpty()) {
+            for (Node n: destroyMe) {
+                group.getChildren().remove(n);
+            }
+        }
     }
 
     private Group addToRoot(Group root, Group addMe) {
@@ -164,11 +173,7 @@ public class Game extends Application {
         for (Wall w: Wall.createAllWalls()) {wallGroup.getChildren().add(w);}
     }
 
-    private void clearBouncers() {
-        bouncerGroup.getChildren().clear();
-    }
-
-    private void createBouncers() {
+    private void createBouncer() {
         Bouncer b = new Bouncer();
         resetBouncer(b);
         bouncerGroup.getChildren().add(b);
@@ -177,7 +182,7 @@ public class Game extends Application {
     private void createBricks() {
         System.out.println("STARTING LEVEL: " + LEVEL);
         LIVES_AT_LEVEL_START = LIVES_LEFT;
-        double[] wallBounds = getWallBounds();
+        double[] wallBounds = Wall.getWallBounds(wallGroup);
         double paddleBound = getPaddleBound();
         BRICK_FIELD_TEXT = "resources/level_" + LEVEL + ".txt";
         Collection<Brick> myBricks = createAllBricks(wallBounds, paddleBound, BRICK_FIELD_TEXT);
@@ -188,70 +193,54 @@ public class Game extends Application {
         return myPaddle.getBoundsInLocal().getMinY();
     }
 
-    // int: {left_bound, right_bound, top_bound}
-    private double[] getWallBounds() {
-        double[] wallBounds = new double[3];
-        for (Node n: wallGroup.getChildren()) {
-            if (n instanceof Wall) {
-                Wall w = (Wall) n;
-                if (w.getMyName().equals("LEFT")) {
-                    wallBounds[0] = w.getBoundsInLocal().getMaxX();
-                } else if (w.getMyName().equals("RIGHT")) {
-                    wallBounds[1] = w.getBoundsInLocal().getMinX();
-                } else if (w.getMyName().equals("TOP")) {
-                    wallBounds[2] = w.getBoundsInLocal().getMaxY();
-                }
-            }
-        }
-        return wallBounds;
-    }
-
     private void resetBouncer(Bouncer b) {
         b.setCenterX(myPaddle.getX() + myPaddle.getWidth() / 2);
         b.setCenterY(myPaddle.getY() - b.getRadius());
         b.setBouncerStuck(true);
         b.setBouncerSpeed(0);
-        displayLives();
     }
 
     private void displayLives() {
         System.out.println("LIVES: " + LIVES_LEFT);
     }
 
-    // TODO: Implement out of bounds detection
     private void outOfBoundsDetection() {
+        Collection<Node> removeBouncer = new ArrayList<Node>();
         for (Node n: bouncerGroup.getChildren()) {
             if (n instanceof Bouncer) {
                 Bouncer b = (Bouncer) n;
-                if (b.getCenterY() > SCREEN_HEIGHT) {
-                    LIVES_LEFT --;
-                    if (checkLives()) {
-                        resetBouncer(b);
-                    } else {
-                        gameOver();
-                    }
+                if (b.getCenterY() >= SCREEN_HEIGHT) {
+                    removeBouncer.add(n);
                 }
             }
         }
+        removeNodes(removeBouncer, bouncerGroup);
+    }
+
+    private void checkBouncersLeft() {
+        if ((bouncerGroup.getChildren().isEmpty())) {
+            LIVES_LEFT --;
+            if (LIVES_LEFT < 1) {
+                gameOver();
+            } else {
+                createBouncer();
+            }
+        }
+    }
+
+    private void gameOver() {
+        System.out.println("GAME OVER!!");
+        System.exit(0);
     }
 
     private void checkLevelClear() {
         if (brickGroup.getChildren().isEmpty()) {
             System.out.println("LEVEL " + LEVEL + " CLEARED!!");
             LEVEL ++;
-            clearBouncers();
+            Bouncer.clearBouncers(bouncerGroup);
             createBricks();
-            createBouncers();
+            createBouncer();
         }
-    }
-
-    private boolean checkLives() {
-        return (LIVES_LEFT > 0);
-    }
-
-    private void gameOver() {
-        System.out.println("GAME OVER!!");
-        System.exit(0);
     }
 
     private void moveBouncers(double elapsedTime) {
@@ -317,8 +306,8 @@ public class Game extends Application {
         LIVES_LEFT = LIVES_AT_LEVEL_START;
         System.out.println("RESTARTING LEVEL!!");
         createBricks();
-        clearBouncers();
-        createBouncers();
+        Bouncer.clearBouncers(bouncerGroup);
+        createBouncer();
     }
 
     public Collection<Brick> createAllBricks(double[] wallBounds, double paddleBound, String brickFieldText) {
