@@ -11,9 +11,6 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 import javafx.util.Duration;
 
 import java.io.File;
@@ -23,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Main game engine to process game rules, calls additional classes
@@ -40,6 +36,7 @@ public class Game extends Application {
     private static int LIVES_AT_LEVEL_START;
     private static int POINTS_SCORED = 0;
     private int LEVEL = 1;
+    private int MAX_LEVEL = 3;
 
     // Game play metadata
     private static final int FRAMES_PER_SECOND = 120;
@@ -55,18 +52,18 @@ public class Game extends Application {
     private int ROWS_OF_BRICKS;
 
     // dynamic variable sizes to configure at start of level
-    private static double BRICK_HEIGHT;
-    private static double BRICK_WIDTH;
+    private double BRICK_HEIGHT;
+    private double BRICK_WIDTH;
 
     // dynamic variable locations calculated from file config
-    private static double BRICK_START_X;
-    private static double BRICK_START_Y;
+    private double BRICK_START_X;
+    private double BRICK_START_Y;
 
     // Brick padding (as percent values)
-    private static final double BRICK_TOP_PAD = 0.30;
-    private static final double BRICK_BOTTOM_PAD = 0.30;
-    private static final double BRICK_RIGHT_PAD = 0.15;
-    private static final double BRICK_LEFT_PAD = 0.15;
+    private static final double BRICK_TOP_PAD = 0.20;
+    private static final double BRICK_BOTTOM_PAD = 0.60;
+    private static final double BRICK_RIGHT_PAD = 0.00;
+    private static final double BRICK_LEFT_PAD = 0.00;
 
     // some things needed to remember during the game
     private Scene myScene;
@@ -138,7 +135,7 @@ public class Game extends Application {
     }
 
     // Change properties of shapes in small ways to animate them over time
-    private void step (double elapsedTime) {
+    private void step(double elapsedTime) {
         // update "actors" attributes
         moveBouncers(elapsedTime);
         Collision.collisionDetection(bouncerGroup, brickGroup,  wallGroup, myPaddle);
@@ -233,10 +230,18 @@ public class Game extends Application {
         System.exit(0);
     }
 
+    private void gameWin() {
+        System.out.println("GAME WIN!!");
+        System.exit(0);
+    }
+
     private void checkLevelClear() {
         if (brickGroup.getChildren().isEmpty()) {
             System.out.println("LEVEL " + LEVEL + " CLEARED!!");
             LEVEL ++;
+            if (LEVEL > MAX_LEVEL) {
+                gameWin();
+            }
             Bouncer.clearBouncers(bouncerGroup);
             createBricks();
             createBouncer();
@@ -352,8 +357,8 @@ public class Game extends Application {
         double verticalSpace = paddleBound - wallBounds[2];
         BRICK_WIDTH = (horizontalSpace) * (1 - (BRICK_LEFT_PAD + BRICK_RIGHT_PAD)) / BRICKS_PER_ROW;
         BRICK_HEIGHT = (verticalSpace) * (1 - (BRICK_TOP_PAD + BRICK_BOTTOM_PAD)) / ROWS_OF_BRICKS;
-        BRICK_START_X = horizontalSpace * BRICK_LEFT_PAD;
-        BRICK_START_Y = verticalSpace * BRICK_RIGHT_PAD;
+        BRICK_START_X = horizontalSpace * BRICK_LEFT_PAD + wallBounds[0];
+        BRICK_START_Y = verticalSpace * BRICK_TOP_PAD + wallBounds[2];
     }
 
     public static void main (String[] args) {

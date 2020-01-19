@@ -1,28 +1,34 @@
 package breakout;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 public class LevelGenerator {
 
     // Vars visible to external devices
-    public static int LEVEL;
-    public static String FILE_NAME = "resources/level_" + LEVEL + ".txt";
-    public static final int SIDE_PAD = 2;     // maintain less than 1/2 of BRICKS_PER_ROW
+    private static int LEVEL;
+    private static int MAX_LEVEL = 5;
+    private static final int SIDE_PAD = 2;     // maintain less than 1/2 of BRICKS_PER_ROW
 
     // Vars private to this class
     private static final int BRICKS_PER_ROW = 10;
-    private static final int ROWS_OF_BRICKS = 3;
+    private static final int ROWS_OF_BRICKS = 1;
     private static String SEPARATOR = " ";
 
-    public LevelGenerator(int level) throws FileNotFoundException {
+    public LevelGenerator(int level) throws IOException {
         LEVEL = level;
         createLevel(LEVEL);
     }
 
-    private static void createLevel(int level) throws FileNotFoundException {
+    private static String nameFile() {
+        return "resources/level_" + LEVEL + ".txt";
+    }
+
+    private static void createLevel(int level) throws IOException {
         LEVEL = level;
-        PrintWriter writer = new PrintWriter(FILE_NAME);
+        PrintWriter writer = new PrintWriter(nameFile());
         int brick; int localPad;
         printInt("BRICKS_PER_ROW" + SEPARATOR + BRICKS_PER_ROW, writer, true);
         printInt("ROWS_OF_BRICKS" + SEPARATOR + ROWS_OF_BRICKS, writer, true);
@@ -43,8 +49,8 @@ public class LevelGenerator {
         writer.close();
     }
 
-    private void generateLevels() throws FileNotFoundException {
-        for (int i = 1; i <  3; i ++) {
+    private static void generateLevels() throws IOException {
+        for (int i = 1; i <=  MAX_LEVEL; i ++) {
             createLevel(i);
         }
     }
@@ -58,4 +64,9 @@ public class LevelGenerator {
             w.print(s + SEPARATOR);
         }
     }
+
+    public static void main(String[] args) throws IOException {
+        generateLevels();
+    }
+
 }

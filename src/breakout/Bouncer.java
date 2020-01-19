@@ -9,11 +9,11 @@ import javafx.scene.shape.Shape;
 
 public class Bouncer extends Circle {
 
-    private static double BOUNCER_THETA = - Math.PI / 2;
+    private double BOUNCER_THETA = - Math.PI / 2;
     private static int BOUNCER_NORMAL_SPEED = 180;
-    private static int BOUNCER_SPEED = BOUNCER_NORMAL_SPEED;
+    private int BOUNCER_SPEED = BOUNCER_NORMAL_SPEED;
     private static int BOUNCER_RADIUS = 8;
-    private static boolean BOUNCER_STUCK = false;
+    private boolean BOUNCER_STUCK = false;
     private static Paint BOUNCER_COLOR = Color.GOLD;
     private static int BOUNCER_DAMAGE = 1;
 

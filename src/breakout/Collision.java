@@ -11,6 +11,8 @@ import java.util.Collection;
 
 public class Collision {
 
+    private static final boolean printCollisionData = true;
+
     public static void collisionDetection(Group bouncerGroup, Group brickGroup, Group wallGroup, Paddle myPaddle) {
         Collection<Node> destroyedBricks = new ArrayList<Node>();
         for (Node n1: bouncerGroup.getChildren()) {
@@ -84,9 +86,21 @@ public class Collision {
     }
 
     private static void testPaddleCollision(Bouncer b, Paddle p) {
-        if (Collision.shapeCollision(b, p)) {
+        if (shapeCollision(b, p)) {
             angleDeflect(b, p);
         }
+    }
+
+    public static boolean groupTouchingShape(Group group, Shape shape) {
+        for (Node n: group.getChildren()) {
+            if (n instanceof Shape) {
+                Shape s = (Shape) n;
+                if (shapeCollision(s, shape)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static void basicDeflect(double[] redirect, Bouncer b) {
@@ -95,10 +109,12 @@ public class Collision {
     }
 
     private static void printCollision(Bouncer b, String object, double[] redirect) {
-        System.out.println("FOUND " + object + " COLLISION");
-        System.out.println("scale: " + redirect[0] + ", shift: " + redirect[1]);
-        System.out.println("theta(1): " + b.getBouncerTheta());
-        System.out.println("theta(0): " + b.getBouncerTheta());
+        if (printCollisionData) {
+            System.out.println("FOUND " + object + " COLLISION");
+            System.out.println("scale: " + redirect[0] + ", shift: " + redirect[1]);
+            System.out.println("theta(1): " + b.getBouncerTheta());
+            System.out.println("theta(0): " + b.getBouncerTheta());
+        }
     }
 
     private static void angleDeflect(Bouncer b, Paddle p) {
