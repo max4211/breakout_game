@@ -194,12 +194,16 @@ public class Game extends Application {
                     if (n3 instanceof Brick) {
                         Brick k = (Brick) n3;
                         redirect = checkRectangleBouncerCollision(k, b);
-                        if (redirect[0] != 0 && k.getBrickPower() > 0) {
-                            basicDeflect(redirect, b);
-                            redirect = new double[2];
-                            if (k.hitBrick(b.getBouncerDamage())) {
-                                System.out.println("adding brick to destroyed list");
-                                destroyedBricks.add(n3);
+                        if (redirect[0] != 0) {
+                            System.out.println("brick collision found, checking power");
+                            if (k.getBrickPower() > 0) {
+                                System.out.println("power empty");
+                                basicDeflect(redirect, b);
+                                redirect = new double[2];
+                                if (k.hitBrick(b.getBouncerDamage())) {
+                                    System.out.println("adding brick to destroyed list");
+                                    destroyedBricks.add(n3);
+                                }
                             }
                         }
                     }
@@ -213,7 +217,10 @@ public class Game extends Application {
     private void clearBricks(Collection<Node> destroyedBricks) {
         if (!destroyedBricks.isEmpty()) {
             System.out.println("clearing bricks");
+            int counter = 0;
             for (Node n: destroyedBricks) {
+                System.out.println("brick #" + counter + " cleared.");
+                counter ++;
                 brickGroup.getChildren().remove(n);
             }
         }

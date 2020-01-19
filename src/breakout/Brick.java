@@ -15,8 +15,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Brick extends Rectangle {
 
-    private Rectangle myBrick;
-
     // Brick constant metadata
     private static final double BRICK_STROKE_WIDTH = 0.05;
 
