@@ -16,20 +16,8 @@ public class Bouncer extends Circle {
     private static Paint BOUNCER_COLOR = Color.GOLD;
     private static int BOUNCER_DAMAGE = 1;
 
-    private Circle myBouncer;
-
     public Bouncer() {
-        myBouncer = new Circle();
-        myBouncer.setRadius(BOUNCER_RADIUS);
-        myBouncer.setFill(BOUNCER_COLOR);
-    }
-
-    public Bouncer(Circle ball) {
-        myBouncer = ball;
-    }
-
-    public Circle getMyBouncer() {
-        return myBouncer;
+        super(BOUNCER_RADIUS, BOUNCER_COLOR);
     }
 
     public double getBouncerTheta() {

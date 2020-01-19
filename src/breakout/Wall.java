@@ -11,7 +11,6 @@ import java.util.Collection;
 
 public class Wall extends Rectangle {
 
-    private Rectangle myWall;
     private String myName;
 
     // Wall metadata
@@ -20,31 +19,12 @@ public class Wall extends Rectangle {
     private static final Paint WALL_FILL = Color.BLACK;
 
     public Wall(int x, int y, int width, int height, String name) {
-        myWall = new Rectangle (x, y, width, height);
+        super(x, y, width, height);
         myName = name;
-    }
-
-    public Wall(Rectangle rect, String name) {
-        myWall = rect;
-        myName = name;
-    }
-
-    public Wall(int x, int y, int width, int height) {
-        myWall = new Rectangle (x, y, width, height);
-        myName = "";
-    }
-
-    public Wall(Rectangle rect) {
-        myWall = rect;
-        myName = "";
     }
 
     public String getMyName() {
         return myName;
-    }
-
-    public Rectangle getMyWall() {
-        return myWall;
     }
 
     // ensure no overlap, use wall positional data to create bounds for brick construction

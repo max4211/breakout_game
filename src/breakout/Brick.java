@@ -44,36 +44,25 @@ public class Brick extends Rectangle {
     private static final double BRICK_LEFT_PAD = 0.15;
 
     public Brick(double x, double y, int power) {
-        myBrick = new Rectangle(x, y, BRICK_WIDTH, BRICK_HEIGHT);
+        super(x, y, BRICK_WIDTH, BRICK_HEIGHT);
         BRICK_POWER = power;
-        myBrick.setFill(BRICK_COLOR);
-        myBrick.setStrokeWidth(myBrick.getWidth() * BRICK_STROKE_WIDTH);
-        myBrick.setStroke(BRICK_STROKE_COLOR);
-    }
-
-    public Rectangle getMyBrick() {
-        return myBrick;
+        this.setFill(BRICK_COLOR);
+        this.setStrokeWidth(this.getWidth() * BRICK_STROKE_WIDTH);
+        this.setStroke(BRICK_STROKE_COLOR);
     }
 
     public int getBrickPower() {
         return BRICK_POWER;
     }
 
-    public void hitBrick(int damage) {
+    public boolean hitBrick(int damage) {
         updateBrickPower(damage);
         updateBrickColor();
+        return (BRICK_POWER < 1);
     }
 
     public void updateBrickPower(int damage) {
         BRICK_POWER -= damage;
-        if (BRICK_POWER < 1) {
-            destroyBrick();
-        }
-    }
-
-    private void destroyBrick() {
-        BRICK_COLOR = Color.TRANSPARENT;
-        BRICK_STROKE_COLOR = Color.TRANSPARENT;
     }
 
     public void updateBrickColor() {
@@ -96,7 +85,6 @@ public class Brick extends Rectangle {
                         if (brickRow == 0) {calculateBrickDimensions(wallBounds, paddleBound);}
                         allBricks.addAll(createBrickList(dataSplit, brickRow));
                         brickRow ++;
-
                     }
                     break;
                 }
@@ -114,17 +102,6 @@ public class Brick extends Rectangle {
         BRICK_HEIGHT = (verticalSpace) * (1 - (BRICK_TOP_PAD + BRICK_BOTTOM_PAD)) / ROWS_OF_BRICKS;
         BRICK_START_X = horizontalSpace * BRICK_LEFT_PAD;
         BRICK_START_Y = verticalSpace * BRICK_RIGHT_PAD;
-
-        /*
-        for (double d: wallBounds) {System.out.println("wallBound: " + d);}
-        System.out.println("paddleBound: " + paddleBound);
-        System.out.println("verticalSpace: " + verticalSpace);
-        System.out.println("horizontalSpace: " + horizontalSpace);
-        System.out.println("BRICK_WIDTH: " + BRICK_WIDTH);
-        System.out.println("BRICK_HEIGHT: " + BRICK_HEIGHT);
-        System.out.println("BRICK_START_X: " + BRICK_START_X);
-        System.out.println("BRICK_START_Y: " + BRICK_START_Y);
-         */
     }
 
     private static Collection<Brick> createBrickList(String[] dataSplit, int brickRow) {
