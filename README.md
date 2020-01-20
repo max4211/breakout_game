@@ -42,13 +42,19 @@ Cheat keys:
 
 Known Bugs:
 - Collisions do not perform as expected (rare)
+- Paddle can go off the screen (no bounds check)
 
 Extra credit:
 - Level generation class, trivial adjustment to play infinitely
+- Run LevelGenerator with max level set appropriately, then play game
 
 ### Notes/Assumptions
 - Assumed that design was more important than functionality.
 - Assumed that scenes were the best base jfx node (in hindsight, panes might have been better).
+- Power ups assumed to be able to take the form of cheat keys.
 
 ### Impressions
 - Challenging and rewarding first project.
+- Class extensions and inheritance proved very important.
+- New experience using 'super' and 'this' constructor/expression
+- Logical choice to use objects to transport private class information

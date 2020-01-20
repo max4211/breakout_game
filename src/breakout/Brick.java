@@ -17,7 +17,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Brick extends Rectangle {
 
     // Brick constant metadata
-    private static final double BRICK_STROKE_WIDTH = 0.05;
+    private static final double BRICK_STROKE_WIDTH = 0.03;
 
     // dynamic variables to update based on brick collisions
     private int BRICK_POWER = 1;
@@ -48,7 +48,7 @@ public class Brick extends Rectangle {
         super(x, y, width, height);
         BRICK_COLORS = BrickStyler.styleBricks();
         this.setStrokeWidth(this.getWidth() * BRICK_STROKE_WIDTH);
-        this.setStroke(Color.BLACK);
+        this.setStroke(Color.WHITE);
         this.BRICK_POWER = power;
         this.BRICK_ORIGINAL_POWER = power;
         updateBrickColor();
@@ -68,13 +68,24 @@ public class Brick extends Rectangle {
         return (this.BRICK_POWER < 1);
     }
 
-    public void updateBrickColor() {
+    private void updateBrickColor() {
+        Paint fill;
         if (this.BRICK_POWER < 1) {
             this.setFill(Color.TRANSPARENT);
             this.setStroke(Color.TRANSPARENT);
         } else {
-            this.setFill(BRICK_COLORS.get(this.BRICK_POWER));
+            if (BRICK_COLORS.containsKey(this.BRICK_POWER)) {
+                fill = BRICK_COLORS.get(this.BRICK_POWER);
+            } else {
+                fill = BRICK_COLORS.get(Math.random() * 9 + 1);
+                BRICK_COLORS.put(this.BRICK_POWER, fill);
+            }
+            this.setFill(fill);
         }
+    }
+
+    private double randomColorScale() {
+        return Math.random() * 255 + 1;
     }
 
     public int getOriginalPower() {

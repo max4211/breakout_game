@@ -11,6 +11,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.util.Duration;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -28,7 +30,7 @@ public class Game extends Application {
     private int LIVES_AT_LEVEL_START;
     private static int POINTS_SCORED = 0;
     private int LEVEL = 1;
-    private int MAX_LEVEL = 5;
+    private int MAX_LEVEL = 20;
 
     // Game play metadata
     private static final int FRAMES_PER_SECOND = 120;
@@ -43,7 +45,7 @@ public class Game extends Application {
     private Scene myScene;
     private Paddle myPaddle;
     private SplashMenu mySplash;
-    
+
     private Group wallGroup = new Group();
     private Group bouncerGroup = new Group();
     private Group brickGroup = new Group();
@@ -233,6 +235,11 @@ public class Game extends Application {
     }
 
     private void createLevel() {
+        try {
+            new LevelGenerator(LEVEL);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         createBricks();
         createBouncer();
     }
@@ -303,7 +310,7 @@ public class Game extends Application {
         } else if (code == KeyCode.E) {
             myPaddle.extend(1);
         } else if (code == KeyCode.F) {
-            myPaddle.extend(-1);
+            myPaddle.extend(0.5);
         } else if (code == KeyCode.A) {
             myPaddle.speedPaddle();
         } else if (code == KeyCode.W){

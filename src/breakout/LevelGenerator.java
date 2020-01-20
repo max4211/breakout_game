@@ -7,7 +7,7 @@ public class LevelGenerator {
 
     // Vars visible to external devices
     private static int LEVEL;
-    private static int MAX_LEVEL = 5;
+    private static int MAX_LEVEL = 20;
     private static final int SIDE_PAD = 1;     // maintain less than 1/2 of BRICKS_PER_ROW
     private static final int TOP_PAD = 0;
     private static final int BOTTOM_PAD = 1;

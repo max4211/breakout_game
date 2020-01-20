@@ -11,13 +11,12 @@ public class Paddle extends Rectangle {
     // Paddle metadata
     private static final int PADDLE_HEIGHT = 10;
     private static final int PADDLE_FLOAT = 50;              // paddle pixel float above bottom of screen
+    private static final int START_WIDTH = 100;
     private static final double PADDLE_EDGE = Math.PI / 4;   // max paddle angular deflection off edge
     private static final Paint PADDLE_COLOR = Color.BLUEVIOLET;
 
     // Paddle data subject to change
-    private static int START_WIDTH = 100;
     private double PADDLE_SPEED = 15;
-
     private boolean PADDLE_STICKY = false;
     private double EXTEND_FACTOR = 1.5;
     private double SPEED_FACTOR = 1.25;

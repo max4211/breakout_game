@@ -14,8 +14,10 @@ public class BrickStyler {
         brickColors.put(3, Color.YELLOW);
         brickColors.put(4, Color.GREEN);
         brickColors.put(5, Color.BLUE);
-        brickColors.put(6, Color.MAGENTA);
-        brickColors.put(10, Color.BLACK);
+        brickColors.put(6, Color.DARKMAGENTA);
+        brickColors.put(7, Color.VIOLET);
+        brickColors.put(8, Color.DARKSLATEGRAY);
+        brickColors.put(9, Color.CHOCOLATE);
         return brickColors;
     }
 
