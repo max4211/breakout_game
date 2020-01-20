@@ -9,7 +9,8 @@ import javafx.scene.shape.Shape;
 
 public class Bouncer extends Circle {
 
-    private double BOUNCER_THETA = - Math.PI / 2;
+    private double BOUNCER_NORMAL_THETA = - Math.PI / 2;
+    private double BOUNCER_THETA = BOUNCER_NORMAL_THETA;
     private static int BOUNCER_NORMAL_SPEED = 180;
     private int BOUNCER_SPEED = BOUNCER_NORMAL_SPEED;
     private static int BOUNCER_RADIUS = 8;
@@ -65,6 +66,8 @@ public class Bouncer extends Circle {
         return BOUNCER_NORMAL_SPEED;
     }
 
+    public double getBouncerNormalTheta() { return BOUNCER_NORMAL_THETA;}
+
     public int getBouncerDamage() {
         return BOUNCER_DAMAGE;
     }
@@ -72,5 +75,18 @@ public class Bouncer extends Circle {
     public static void clearBouncers(Group bouncerGroup) {
         bouncerGroup.getChildren().clear();
     }
+
+    public void catchBall() {
+        this.BOUNCER_SPEED = 0;
+        this.BOUNCER_STUCK = true;
+    }
+
+    public void releaseBall() {
+        this.BOUNCER_SPEED = BOUNCER_NORMAL_SPEED;
+        this.BOUNCER_THETA = BOUNCER_NORMAL_THETA;
+        this.BOUNCER_STUCK = false;
+
+    }
+
 
 }

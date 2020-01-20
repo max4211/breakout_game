@@ -11,7 +11,7 @@ import java.util.Collection;
 
 public class Collision {
 
-    private static final boolean printCollisionData = true;
+    private static final boolean printCollisionData = false;
 
     public static void collisionDetection(Group bouncerGroup, Group brickGroup, Group wallGroup, Paddle myPaddle) {
         Collection<Node> destroyedBricks = new ArrayList<Node>();
@@ -87,7 +87,11 @@ public class Collision {
 
     private static void testPaddleCollision(Bouncer b, Paddle p) {
         if (shapeCollision(b, p)) {
-            angleDeflect(b, p);
+            if (p.getSticky()) {
+                b.catchBall();
+            } else {
+                angleDeflect(b, p);
+            }
         }
     }
 

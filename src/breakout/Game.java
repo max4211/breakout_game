@@ -23,9 +23,9 @@ public class Game extends Application {
     private static final String TITLE = "Breakout Game JavaFX";
     private static final int SCREEN_WIDTH = 400;
     private static final int SCREEN_HEIGHT = 400;
-    private static int LIVES_LEFT = 3;
-    private static int LIVES_AT_LEVEL_START;
-    private static int POINTS_SCORED = 0;
+    private int LIVES_LEFT = 3;
+    private int LIVES_AT_LEVEL_START;
+    private int POINTS_SCORED = 0;
     private int LEVEL = 1;
     private int MAX_LEVEL = 3;
 
@@ -47,6 +47,7 @@ public class Game extends Application {
     private Group bouncerGroup = new Group();
     private Group brickGroup = new Group();
     private Group textGroup = new Group();
+    private Group powerGroup = new Group();
 
     /**
      * Initialize what will be displayed and how it will be updated.
@@ -144,16 +145,26 @@ public class Game extends Application {
     }
 
     private void createBouncer() {
+        clearBouncer();
         Bouncer b = new Bouncer();
         b.stickBouncerOnPaddle(myPaddle);
         bouncerGroup.getChildren().add(b);
     }
 
+    private void clearBouncer() {
+        bouncerGroup.getChildren().clear();
+    }
+
+    private void clearBricks() {
+        brickGroup.getChildren().clear();
+    }
+
     private void createBricks() {
-        System.out.println("STARTING LEVEL: " + LEVEL);
-        LIVES_AT_LEVEL_START = LIVES_LEFT;
+        clearBricks();
         double[] wallBounds = Wall.getWallBounds(wallGroup);
         double paddleBound = myPaddle.getPaddleBound();
+        System.out.println("STARTING LEVEL: " + LEVEL);
+        LIVES_AT_LEVEL_START = LIVES_LEFT;
         BRICK_FIELD_TEXT = "resources/level_" + LEVEL + ".txt";
         Collection<Brick> myBricks = Brick.createAllBricks(wallBounds, paddleBound, BRICK_FIELD_TEXT);
         for (Brick k: myBricks) {brickGroup.getChildren().add(k);}
@@ -205,10 +216,15 @@ public class Game extends Application {
         }
     }
 
+    private void createLevel(int level) {
+        createBricks();
+        createBouncer();
+    }
+
     private void jumpToLevel(int level) {
         System.out.println("JUMPING TO LEVEL: " + level);
         LEVEL = level;
-        restartLevel();
+        createLevel(LEVEL);
     }
 
     private void restartLevel() {
@@ -250,8 +266,7 @@ public class Game extends Application {
             if (n instanceof Bouncer) {
                 Bouncer b  = (Bouncer) n;
                 if (b.getBouncerStuck()) {
-                    b.setBouncerStuck(false);
-                    b.setBouncerSpeed(b.getBouncerNormalSpeed());
+                    b.releaseBall();
                 }
             }
         }
@@ -269,11 +284,23 @@ public class Game extends Application {
             displayLives();
         } else if (code == KeyCode.R) {
             restartLevel();
-        } else if (code == KeyCode.NUMPAD2) {
-            jumpToLevel(2);
-        } else if (code == KeyCode.NUMPAD3) {
-            jumpToLevel(3);
+        } else if (code == KeyCode.S) {
+            myPaddle.toggleSticky();
+        } else if (code == KeyCode.E) {
+            myPaddle.extend();
+        } else if (code == KeyCode.A) {
+            myPaddle.speedPaddle();
         }
+        // TODO: Implement level skip
+        /*
+        else if (code == KeyCode.DIGIT2) {
+            jumpToLevel(2);
+        } else if (code == KeyCode.DIGIT3) {
+            jumpToLevel(3);
+        } else if (code == KeyCode.DIGIT4) {
+            jumpToLevel(4);
+        }
+         */
     }
 
     public static void main (String[] args) {

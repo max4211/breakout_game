@@ -1,7 +1,5 @@
 package breakout;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -31,7 +29,7 @@ public class LevelGenerator {
     private static void createLevel(int level) throws IOException {
         LEVEL = level;
         PrintWriter writer = new PrintWriter(nameFile());
-        int brick; int localPad; boolean vertPad;
+        String brick; int localPad; boolean vertPad;
         printInt("BRICKS_PER_ROW" + SEPARATOR + BRICKS_PER_ROW, writer, true);
         printInt("ROWS_OF_BRICKS" + SEPARATOR + ROWS_OF_BRICKS, writer, true);
         for (int i = 0; i < ROWS_OF_BRICKS; i ++) {
@@ -40,16 +38,20 @@ public class LevelGenerator {
             for (int j = 0; j < BRICKS_PER_ROW; j ++) {
                 localPad ++;
                 if (clearHorizontalPad(localPad, vertPad)) {
-                    brick = (int)(Math.random() * LEVEL + 1);
+                    brick = assignBrick();
                 } else {
-                    brick = 0;
+                    brick = "0";
                 }
-                printInt(Integer.toString(brick), writer, false);
+                printInt(brick, writer, false);
             }
             System.out.println();
             writer.println();
         }
         writer.close();
+    }
+
+    private static String assignBrick() {
+        return Integer.toString((int)(Math.random() * LEVEL + 1));
     }
 
     private static boolean clearVerticalPad(int i) {

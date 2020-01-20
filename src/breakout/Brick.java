@@ -5,7 +5,6 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.Map;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ public class Brick extends Rectangle {
     private static final double BRICK_STROKE_WIDTH = 0.05;
 
     // dynamic variables to update based on brick collisions
-    private int BRICK_POWER;
+    private int BRICK_POWER = 1;
     private static Map<Integer, javafx.scene.paint.Paint> BRICK_COLORS;
 
     // Brick metadata read from file
@@ -41,13 +40,19 @@ public class Brick extends Rectangle {
     private static final double BRICK_RIGHT_PAD = 0.00;
     private static final double BRICK_LEFT_PAD = 0.00;
 
+    private PowerUp myPower;
+
     public Brick(double x, double y, double width, double height, int power) {
         super(x, y, width, height);
         BRICK_COLORS = BrickStyler.styleBricks();
-        this.BRICK_POWER = power;
         updateBrickColor();
         this.setStrokeWidth(this.getWidth() * BRICK_STROKE_WIDTH);
         this.setStroke(Color.BLACK);
+        this.BRICK_POWER = power;
+    }
+
+    public void assignPower(PowerUp p) {
+        this.myPower = p;
     }
 
     public int getBrickPower() {
@@ -92,17 +97,26 @@ public class Brick extends Rectangle {
         } catch (FileNotFoundException e) {
             System.out.println("ERROR: " + e);
         }
+        return powerUpBricks(allBricks);
+    }
+
+    private static Collection<Brick> powerUpBricks(Collection<Brick> allBricks) {
+        for (Brick b: allBricks) {
+            b.assignPower(new PowerUp('X'));
+        }
         return allBricks;
     }
 
     private static Collection<Brick> createBrickList(String[] dataSplit, int brickRow) {
         Collection<Brick> brickList = new ArrayList<Brick>();
         for (int i = 0; i < dataSplit.length; i ++) {
-            int power = Integer.parseInt(dataSplit[i]);
-            if (power > 0) {
-                brickList.add(new Brick(BRICK_START_X + (BRICK_WIDTH * i), BRICK_START_Y + (BRICK_HEIGHT * brickRow), BRICK_WIDTH, BRICK_HEIGHT, power));
+            int brick = Integer.parseInt(dataSplit[i]);
+            if (brick > 0) {
+                Brick b = new Brick(BRICK_START_X + (BRICK_WIDTH * i), BRICK_START_Y + (BRICK_HEIGHT * brickRow), BRICK_WIDTH, BRICK_HEIGHT, brick);
+                brickList.add(b);
             }
         }
+
         return brickList;
     }
 

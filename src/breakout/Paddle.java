@@ -15,26 +15,38 @@ public class Paddle extends Rectangle {
     private static final Paint PADDLE_COLOR = Color.BLUEVIOLET;
 
     // Paddle data subject to change
-    private static int PADDLE_WIDTH = 100;
-    private static int PADDLE_SPEED = 15;
+    private static int START_WIDTH = 100;
+    private double PADDLE_SPEED = 15;
+
+    private boolean PADDLE_STICKY = false;
+    private double EXTEND_FACTOR = 1.5;
+    private double SPEED_FACTOR = 1.25;
 
     // Constructors
     public Paddle(int width, int height) {
-        super(PADDLE_WIDTH, PADDLE_HEIGHT);
+        super(START_WIDTH, PADDLE_HEIGHT);
         this.setX(width / 2 - this.getBoundsInLocal().getWidth() / 2);
         this.setY(height - this.getBoundsInLocal().getHeight() / 2 - PADDLE_FLOAT);
         this.setFill(PADDLE_COLOR);
+    }
+
+    public void extend() {
+        this.setWidth(this.getWidth() * EXTEND_FACTOR);
+    }
+
+    public void speedPaddle() {
+        this.setPaddleSpeed(this.getPaddleSpeed() * SPEED_FACTOR);
     }
 
     public double getPaddleBound() {
         return this.getBoundsInLocal().getMinY();
     }
 
-    public int getPaddleSpeed() {
+    public double getPaddleSpeed() {
         return PADDLE_SPEED;
     }
 
-    public void setPaddleSpeed(int speed) {
+    public void setPaddleSpeed(double speed) {
         PADDLE_SPEED = speed;
     }
 
@@ -46,4 +58,11 @@ public class Paddle extends Rectangle {
         return 0;
     }
 
+    public void toggleSticky() {
+        this.PADDLE_STICKY = !(PADDLE_STICKY);
+    }
+
+    public boolean getSticky() {
+        return PADDLE_STICKY;
+    }
 }
