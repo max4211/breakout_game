@@ -17,7 +17,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Main game engine to process game rules, calls additional classes
+ * Main game engine to process game rules
+ * Stores a group of all objects (bouncers, walls, bricks, splash displays)
+ * Set metadata on top to configure game set up, then run
  * @author Max Smith
  */
 public class Game extends Application {
@@ -117,6 +119,13 @@ public class Game extends Application {
         }
     }
 
+    /**
+     * Scene is governed by groups of objects (e.g. bouncers and bricks)
+     * In other methods, nodes to remove are accumulated then removed here
+     * Helps avoid concurrent modification exception when iterating through collection
+     * @param destroyMe collection of nodes to destroy
+     * @param group group to destroy nodes from
+     */
     public static void removeNodes(Collection<Node> destroyMe, Group group) {
         if (!destroyMe.isEmpty()) {
             for (Node n: destroyMe) {
@@ -272,12 +281,12 @@ public class Game extends Application {
     }
 
     private void sideKeyPress(int direct) {
-        myPaddle.setX(myPaddle.getX() + direct * myPaddle.getPaddleSpeed());
+        myPaddle.sideKey(direct);
         for (Node n: bouncerGroup.getChildren()) {
             if (n instanceof Bouncer) {
                 Bouncer b  = (Bouncer) n;
                 if (b.getBouncerStuck()) {
-                    b.setCenterX(b.getCenterX() + direct * myPaddle.getPaddleSpeed());
+                    b.setCenterX(b.getCenterX() + direct * myPaddle.getSpeed());
                 }
             }
         }
@@ -341,6 +350,10 @@ public class Game extends Application {
         }
     }
 
+    /**
+     * Main method, start of program
+     * @param args arguments into main metehod
+     */
     public static void main (String[] args) {
         launch(args);
     }

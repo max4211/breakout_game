@@ -1,12 +1,11 @@
 package breakout;
 
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-
-import java.awt.*;
+/**
+ * Splash menu - shows basic text box of instructions at start of game
+ * @author Max Smith
+ */
 
 public class SplashMenu extends Text{
 
@@ -48,11 +47,18 @@ public class SplashMenu extends Text{
         this.setText("");
     }
 
+    /**
+     * Splash toggle used to enter game play
+     */
     public void toggleSplash() {
         this.SHOW_SPLASH = !(SHOW_SPLASH);
         updateSplash();
     }
 
+    /**
+     *  Used to validate game play (guard, no play while splash is up)
+     * @return splash status
+     */
     public boolean isShowing() {
         return this.SHOW_SPLASH;
     }

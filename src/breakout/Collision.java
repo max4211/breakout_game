@@ -9,10 +9,24 @@ import javafx.scene.shape.Shape;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * General handling of collision detection
+ * Functional object, more of a storehouse for similar methods
+ * Note refactoring and group analysis with cast to each object, then general collision processing
+ * Bouncer coordinates in polar, paddle handles adjusted reflection
+ * @author Max Smith
+ */
 public class Collision {
 
     private static final boolean printCollisionData = false;
 
+    /**
+     * Iterate through all groups (building blocks of scene), verifying collisions
+     * @param bouncerGroup all bouncers in scene
+     * @param brickGroup all bricks in scene
+     * @param wallGroup all walls in scene (permanent objects)
+     * @param myPaddle only paddle in map
+     */
     public static void collisionDetection(Group bouncerGroup, Group brickGroup, Group wallGroup, Paddle myPaddle) {
         Collection<Node> destroyedBricks = new ArrayList<Node>();
         for (Node n1: bouncerGroup.getChildren()) {
@@ -93,18 +107,6 @@ public class Collision {
                 angleDeflect(b, p);
             }
         }
-    }
-
-    public static boolean groupTouchingShape(Group group, Shape shape) {
-        for (Node n: group.getChildren()) {
-            if (n instanceof Shape) {
-                Shape s = (Shape) n;
-                if (shapeCollision(s, shape)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     private static void basicDeflect(double[] redirect, Bouncer b) {

@@ -43,15 +43,18 @@ Cheat keys:
 Known Bugs:
 - Collisions do not perform as expected (rare)
 - Paddle can go off the screen (no bounds check)
+- You can play over splash screen, glitches occur
+- IOException for new files (should use different writer, create file if not exists)
 
 Extra credit:
 - Level generation class, trivial adjustment to play infinitely
-- Run LevelGenerator with max level set appropriately, then play game
+    - Run LevelGenerator with max level set appropriately, then play game
 
 ### Notes/Assumptions
 - Assumed that design was more important than functionality.
 - Assumed that scenes were the best base jfx node (in hindsight, panes might have been better).
 - Power ups assumed to be able to take the form of cheat keys.
+- Paddle deflection dynamically calculated based on where intersection occurs
 
 ### Impressions
 - Challenging and rewarding first project.

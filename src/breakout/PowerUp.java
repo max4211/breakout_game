@@ -1,8 +1,11 @@
 package breakout;
 
-import javafx.scene.Group;
 import javafx.scene.shape.Circle;
 
+/**
+ * Power up, TODO
+ * @author Max Smith
+ */
 public class PowerUp extends Circle {
 
     private char myPower;

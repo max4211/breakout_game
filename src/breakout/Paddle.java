@@ -1,11 +1,15 @@
 package breakout;
 
-import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 
+/**
+ * Paddle to hit bouncers and redirect back out into field
+ * See collision for specs on paddle collision angles
+ * Sticky paddle, extension, and speed adjustments all in conjunction with cheat codes
+ * @author Max Smith
+ */
 public class Paddle extends Rectangle {
 
     // Paddle metadata
@@ -21,7 +25,11 @@ public class Paddle extends Rectangle {
     private double EXTEND_FACTOR = 1.5;
     private double SPEED_FACTOR = 1.25;
 
-    // Constructors
+    /**
+     * Paddle constructor, uses lots of static finals (original paddle is set size)
+     * @param width width of main game screen
+     * @param height height of main game screen
+     */
     public Paddle(int width, int height) {
         super(START_WIDTH, PADDLE_HEIGHT);
         this.setX(width / 2 - this.getBoundsInLocal().getWidth() / 2);
@@ -29,6 +37,10 @@ public class Paddle extends Rectangle {
         this.setFill(PADDLE_COLOR);
     }
 
+    /**
+     * Called on paddles to extend (or contract) their size in response to cheat code
+     * @param coef is factor to extend by (less than 1 shrink, greater than 1 expand
+     */
     public void extend(double coef) {
         double oldCenter = (this.getX()) + (this.getWidth() / 2);
         this.setWidth(this.getWidth() * coef * EXTEND_FACTOR);
@@ -39,35 +51,65 @@ public class Paddle extends Rectangle {
         this.setX(center - this.getWidth() / 2);
     }
 
+    /**
+     * Accelerates paddle by global speed factor
+     */
     public void speedPaddle() {
         this.setPaddleSpeed(this.getPaddleSpeed() * SPEED_FACTOR);
     }
 
+    /**
+     * Updates paddle when motion
+     * @param direct is direction of motion (+ right, - left)
+     */
+    public void sideKey(int direct) {
+        this.setX(this.getX() + direct * this.getPaddleSpeed());
+    }
+
+    /**
+     * Helps calculate bouncer adjustment when stuck to paddle
+     * @return paddle speed
+     */
+    public double getSpeed() {
+        return this.PADDLE_SPEED;
+    }
+
+    /**
+     * Helps determine brick dimensions according to spacing
+     * @return paddle upper Y bound
+     */
     public double getPaddleBound() {
         return this.getBoundsInLocal().getMinY();
     }
 
-    public double getPaddleSpeed() {
-        return PADDLE_SPEED;
-    }
-
-    public void setPaddleSpeed(double speed) {
-        PADDLE_SPEED = speed;
-    }
-
-    public double getPaddleEdge() {
-        return PADDLE_EDGE;
-    }
-
-    public double getPaddleUpperBounds() {
-        return 0;
-    }
-
+    /**
+     * Updates paddle sticky in response to cheat code
+     */
     public void toggleSticky() {
         this.PADDLE_STICKY = !(PADDLE_STICKY);
     }
 
+    /**
+     * Helps determine action on ball collision
+     * @return whether paddle is sticky
+     */
     public boolean getSticky() {
         return PADDLE_STICKY;
+    }
+
+    /**
+     * Used in collision detection class to determine angle of deflection
+     * @return largest angle to deflect bouncer
+     */
+    public double getPaddleEdge() {
+        return PADDLE_EDGE;
+    }
+
+    private double getPaddleSpeed() {
+        return PADDLE_SPEED;
+    }
+
+    private void setPaddleSpeed(double speed) {
+        PADDLE_SPEED = speed;
     }
 }

@@ -3,6 +3,14 @@ package breakout;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/**
+ * Level generation class, creates text files that are read in during brick creation
+ * When running, ensure that SIDE_PAD is less than 1/2 of BRICKS_PER_ROW
+ * TOP_PAD + BOTTOM_PAD < ROWS_OF_BRICKS
+ * The padding values create zeroes in place for all subsequent bricks
+ * LEVEL_STYLE can also be set (current configurations are constant and random)
+ * @author Max Smith
+ */
 public class LevelGenerator {
 
     // Vars visible to external devices
@@ -21,6 +29,11 @@ public class LevelGenerator {
     private static final String LEVEL_STYLE = "Constant";
 
 
+    /**
+     *  Constructor to rewrite level file with unique bricks
+     * @param level is the level numer
+     * @throws IOException if and when level file has not been created
+     */
     public LevelGenerator(int level) throws IOException {
         LEVEL = level;
         createLevel(LEVEL);

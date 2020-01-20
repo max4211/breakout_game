@@ -10,6 +10,12 @@ import javafx.scene.shape.Shape;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * Bouncer that goes around scene, impacting bricks and paddle
+ * Coordinate system in use is polar, so bouncer has theta and speed (vector representation)
+ * Updates accordingly using sin and cos
+ * @author Max Smith
+ */
 public class Bouncer extends Circle {
 
     private double BOUNCER_NORMAL_THETA = - Math.PI / 2;

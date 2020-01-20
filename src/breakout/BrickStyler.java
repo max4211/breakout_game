@@ -5,8 +5,16 @@ import javafx.scene.paint.Paint;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Brick styler class, creates map of Paint colors to populate bricks of specific power
+ * @author Max Smith
+ */
 public class BrickStyler {
 
+    /**
+     * Method to create map of brick styles, helpls determine fill from power
+     * @return map of brick styles
+     */
     public static Map<Integer, Paint> styleBricks() {
         Map<Integer, Paint> brickColors = new HashMap<Integer, Paint>();
         brickColors.put(1, Color.RED);
