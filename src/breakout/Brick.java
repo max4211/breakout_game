@@ -109,8 +109,13 @@ public class Brick extends Rectangle {
         }
     }
 
-    private double randomColorScale() {
-        return Math.random() * 255 + 1;
+    /**
+     * Used in collision detection, helps avoid cases where bricks have been destroyed but not removed
+     * Brick collision must be of real power
+     * @return power of brick
+     */
+    public int getBrickPower() {
+        return this.BRICK_POWER;
     }
 
     /**
