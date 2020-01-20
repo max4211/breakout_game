@@ -7,6 +7,9 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public class Bouncer extends Circle {
 
     private double BOUNCER_NORMAL_THETA = - Math.PI / 2;
@@ -20,6 +23,33 @@ public class Bouncer extends Circle {
 
     public Bouncer() {
         super(BOUNCER_RADIUS, BOUNCER_COLOR);
+    }
+
+    public static Group addBouncers(Group bouncerGroup) {
+        Collection<Bouncer> newBouncers = new ArrayList<Bouncer>();
+        for (Node n: bouncerGroup.getChildren()) {
+            if (n instanceof Bouncer) {
+                Bouncer b1 = (Bouncer) n;
+                newBouncers.add(duplicateBouncer(b1));
+            }
+        }
+        for (Bouncer b: newBouncers) {
+            bouncerGroup.getChildren().add(b);
+        }
+        return bouncerGroup;
+    }
+
+    private static Bouncer duplicateBouncer(Bouncer b) {
+        Bouncer b2 = new Bouncer();
+        b2.setBouncerTheta(randomTheta(b));
+        b2.setCenterX(b.getCenterX());
+        b2.setCenterY(b.getCenterY());
+        return b2;
+    }
+
+    private static double randomTheta(Bouncer b) {
+        double theta = b.getBouncerTheta();
+        return theta * 1 / 4;
     }
 
     public double getBouncerTheta() {

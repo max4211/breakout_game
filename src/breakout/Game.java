@@ -304,6 +304,8 @@ public class Game extends Application {
             myPaddle.speedPaddle();
         } else if (code == KeyCode.Q) {
             // Debug code
+        } else if (code == KeyCode.X) {
+            Bouncer.addBouncers(bouncerGroup);
         } else if (code == KeyCode.DIGIT2) {
             jumpToLevel(2);
         } else if (code == KeyCode.DIGIT3) {
