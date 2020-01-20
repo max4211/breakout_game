@@ -239,6 +239,9 @@ public class Game extends Application {
     }
 
     private void jumpToLevel(int level) {
+        if (level > MAX_LEVEL) {
+            level = MAX_LEVEL;
+        }
         LEVEL = level;
         createLevel();
     }
@@ -306,11 +309,13 @@ public class Game extends Application {
             myPaddle.speedPaddle();
         } else if (code == KeyCode.W){
             Bouncer.slowBouncers(bouncerGroup);
-        }
-        else if (code == KeyCode.Q) {
+        } else if (code == KeyCode.Q) {
             // Debug code
         } else if (code == KeyCode.X) {
             Bouncer.addBouncers(bouncerGroup);
+        } else if (code == KeyCode.ENTER) {
+            mySplash.toggleSplash();
+            jumpToLevel(LEVEL);
         } else if (code == KeyCode.DIGIT2) {
             jumpToLevel(2);
         } else if (code == KeyCode.DIGIT3) {
@@ -319,9 +324,14 @@ public class Game extends Application {
             jumpToLevel(4);
         } else if (code == KeyCode.DIGIT5) {
             jumpToLevel(5);
-        } else if (code == KeyCode.ENTER) {
-            mySplash.toggleSplash();
-            jumpToLevel(LEVEL);
+        } else if (code == KeyCode.DIGIT6) {
+            jumpToLevel(6);
+        } else if (code == KeyCode.DIGIT7) {
+            jumpToLevel(7);
+        } else if (code == KeyCode.DIGIT8) {
+            jumpToLevel(8);
+        } else if (code == KeyCode.DIGIT9) {
+            jumpToLevel(9);
         }
     }
 

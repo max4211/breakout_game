@@ -38,6 +38,7 @@ Cheat keys:
 - 'S' make paddle sticky (space to release)
 - 'A' accelerate paddle speed
 - 'W' slow all bouncers on screen
+- '1-9' jump to highest available level
 
 Known Bugs:
 - Collisions do not perform as expected (rare)
