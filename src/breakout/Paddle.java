@@ -30,8 +30,14 @@ public class Paddle extends Rectangle {
         this.setFill(PADDLE_COLOR);
     }
 
-    public void extend() {
-        this.setWidth(this.getWidth() * EXTEND_FACTOR);
+    public void extend(double coef) {
+        double oldCenter = (this.getX()) + (this.getWidth() / 2);
+        this.setWidth(this.getWidth() * coef * EXTEND_FACTOR);
+        this.realign(oldCenter);
+    }
+
+    private void realign(double center) {
+        this.setX(center - this.getWidth() / 2);
     }
 
     public void speedPaddle() {

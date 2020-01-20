@@ -17,13 +17,6 @@ public class PowerUp extends Circle {
         myPower = c;
     }
 
-    // TODO: Impelement power up setting
-    public void usePowerUp(Paddle p, Group bouncerGroup) {
-        if (myPower == 'X') {
-            p.extend();
-        }
-    }
-
     public void move(double elapsedTime) {
         this.setCenterY(this.getCenterY() + this.getFallSpeed() * elapsedTime);
     }

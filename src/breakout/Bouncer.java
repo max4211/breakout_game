@@ -14,12 +14,13 @@ public class Bouncer extends Circle {
 
     private double BOUNCER_NORMAL_THETA = - Math.PI / 2;
     private double BOUNCER_THETA = BOUNCER_NORMAL_THETA;
-    private static int BOUNCER_NORMAL_SPEED = 180;
-    private int BOUNCER_SPEED = BOUNCER_NORMAL_SPEED;
+    private static double BOUNCER_NORMAL_SPEED = 240;
+    private double BOUNCER_SPEED = BOUNCER_NORMAL_SPEED;
     private static int BOUNCER_RADIUS = 8;
     private boolean BOUNCER_STUCK = false;
     private static Paint BOUNCER_COLOR = Color.GOLD;
     private static int BOUNCER_DAMAGE = 1;
+    private static final double SPEED_FACTOR = 0.9;
 
     public Bouncer() {
         super(BOUNCER_RADIUS, BOUNCER_COLOR);
@@ -49,7 +50,11 @@ public class Bouncer extends Circle {
 
     private static double randomTheta(Bouncer b) {
         double theta = b.getBouncerTheta();
-        return theta * 1 / 4;
+        double scale = -1;
+        if (Math.round(Math.random()) == 1) {
+            scale = 1;
+        }
+        return theta + theta / 12 * scale;
     }
 
     public double getBouncerTheta() {
@@ -68,7 +73,7 @@ public class Bouncer extends Circle {
         BOUNCER_STUCK = bool;
     }
 
-    public void setBouncerSpeed(int speed) {
+    public void setBouncerSpeed(double speed) {
         BOUNCER_SPEED = speed;
     }
 
@@ -88,11 +93,11 @@ public class Bouncer extends Circle {
         BOUNCER_STUCK = !(BOUNCER_STUCK);
     }
 
-    public int getBouncerSpeed() {
+    public double getBouncerSpeed() {
         return BOUNCER_SPEED;
     }
 
-    public int getBouncerNormalSpeed() {
+    public double getBouncerNormalSpeed() {
         return BOUNCER_NORMAL_SPEED;
     }
 
@@ -115,7 +120,19 @@ public class Bouncer extends Circle {
         this.BOUNCER_SPEED = BOUNCER_NORMAL_SPEED;
         this.BOUNCER_THETA = BOUNCER_NORMAL_THETA;
         this.BOUNCER_STUCK = false;
+    }
 
+    private void factorSpeed() {
+        this.setBouncerSpeed(this.getBouncerSpeed() * SPEED_FACTOR);
+    }
+
+    public static void slowBouncers(Group bouncerGroup) {
+        for (Node n: bouncerGroup.getChildren()) {
+            if (n instanceof Bouncer) {
+                Bouncer b = (Bouncer) n;
+                b.factorSpeed();
+            }
+        }
     }
 
 

@@ -28,7 +28,7 @@ public class Game extends Application {
     private int LIVES_AT_LEVEL_START;
     private static int POINTS_SCORED = 0;
     private int LEVEL = 1;
-    private int MAX_LEVEL = 2;
+    private int MAX_LEVEL = 5;
 
     // Game play metadata
     private static final int FRAMES_PER_SECOND = 120;
@@ -110,7 +110,7 @@ public class Game extends Application {
         if (!mySplash.isShowing()) {
             moveBouncer(elapsedTime);
             Collision.collisionDetection(bouncerGroup, brickGroup,  wallGroup, myPaddle);
-            outOfBoundsDetection();
+            checkOutOfBounds();
             checkBouncersLeft();
             checkLevelClear();
         }
@@ -187,12 +187,12 @@ public class Game extends Application {
         for (Brick k: myBricks) {brickGroup.getChildren().add(k);}
     }
 
-    private void outOfBoundsDetection() {
+    private void checkOutOfBounds() {
         Collection<Node> removeBouncer = new ArrayList<Node>();
         for (Node n: bouncerGroup.getChildren()) {
             if (n instanceof Bouncer) {
                 Bouncer b = (Bouncer) n;
-                if (b.getCenterY() >= SCREEN_HEIGHT) {
+                if (b.getCenterY() > (myPaddle.getY())) {
                     removeBouncer.add(n);
                 }
             }
@@ -299,10 +299,15 @@ public class Game extends Application {
         } else if (code == KeyCode.S) {
             myPaddle.toggleSticky();
         } else if (code == KeyCode.E) {
-            myPaddle.extend();
+            myPaddle.extend(1);
+        } else if (code == KeyCode.F) {
+            myPaddle.extend(-1);
         } else if (code == KeyCode.A) {
             myPaddle.speedPaddle();
-        } else if (code == KeyCode.Q) {
+        } else if (code == KeyCode.W){
+            Bouncer.slowBouncers(bouncerGroup);
+        }
+        else if (code == KeyCode.Q) {
             // Debug code
         } else if (code == KeyCode.X) {
             Bouncer.addBouncers(bouncerGroup);
