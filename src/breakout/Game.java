@@ -22,13 +22,13 @@ public class Game extends Application {
     // Game metadata
     private static final String TITLE = "Breakout Game JavaFX";
     private static final int SCREEN_WIDTH = 400;
-    private static final int SCREEN_HEIGHT = 500;
-    private static final int DISPLAY_HEIGHT = 100;
+    private static final int SCREEN_HEIGHT = 400;
+    private static final int DISPLAY_HEIGHT = 50;
     private int LIVES_LEFT = 3;
     private int LIVES_AT_LEVEL_START;
     private int POINTS_SCORED = 0;
     private int LEVEL = 1;
-    private int MAX_LEVEL = 3;
+    private int MAX_LEVEL = 4;
 
     // Game play metadata
     private static final int FRAMES_PER_SECOND = 120;
@@ -81,16 +81,17 @@ public class Game extends Application {
         createPaddle();
         createAllWalls();
         createBouncer();
-        createBricks();
+        createDisplay();
 
         root = addSplashToRoot(root);
         root = addPaddleToRoot(root);
         root = addToRoot(root, wallGroup);
         root = addToRoot(root, bouncerGroup);
         root = addToRoot(root, brickGroup);
+        root = addToRoot(root, displayGroup);
 
         ((Bouncer) bouncerGroup.getChildren().get(0)).stickBouncerOnPaddle(myPaddle);
-        scanRoot(root);
+        // scanRoot(root);
         return root;
     }
 
@@ -105,6 +106,7 @@ public class Game extends Application {
 
     // Play game while splash is not dispalyed
     private void step(double elapsedTime) {
+        DisplayMenu.updateFullDisplay(displayGroup, LIVES_LEFT, LEVEL, POINTS_SCORED);
         if (!mySplash.isShowing()) {
             moveBouncer(elapsedTime);
             Collision.collisionDetection(bouncerGroup, brickGroup,  wallGroup, myPaddle);
@@ -141,6 +143,13 @@ public class Game extends Application {
         mySplash = new SplashMenu(SCREEN_WIDTH, SCREEN_HEIGHT);
     }
 
+    // (int width, int height, int heightOffset, double widthOffset, int data, String label) {
+    private void createDisplay() {
+        displayGroup.getChildren().add(new DisplayMenu(SCREEN_WIDTH, SCREEN_HEIGHT, 10, 0.05, LIVES_LEFT, "LIVES"));
+        displayGroup.getChildren().add(new DisplayMenu(SCREEN_WIDTH, SCREEN_HEIGHT, 10, 0.4, LEVEL, "LEVEL"));
+        displayGroup.getChildren().add(new DisplayMenu(SCREEN_WIDTH, SCREEN_HEIGHT, 10, 0.8, POINTS_SCORED, "POINTS"));
+    }
+
     private void createPaddle() {
         myPaddle = new Paddle(SCREEN_WIDTH, SCREEN_HEIGHT);
     }
@@ -168,7 +177,6 @@ public class Game extends Application {
         clearBricks();
         double[] wallBounds = Wall.getWallBounds(wallGroup);
         double paddleBound = myPaddle.getPaddleBound();
-        System.out.println("STARTING LEVEL: " + LEVEL);
         LIVES_AT_LEVEL_START = LIVES_LEFT;
         BRICK_FIELD_TEXT = "resources/level_" + LEVEL + ".txt";
         Collection<Brick> myBricks = Brick.createAllBricks(wallBounds, paddleBound, BRICK_FIELD_TEXT);
@@ -201,7 +209,6 @@ public class Game extends Application {
 
     private void checkLevelClear() {
         if (brickGroup.getChildren().isEmpty()) {
-            System.out.println("LEVEL " + LEVEL + " CLEARED!!");
             LEVEL ++;
             if (LEVEL > MAX_LEVEL) {
                 gameWin();
@@ -227,21 +234,15 @@ public class Game extends Application {
     }
 
     private void jumpToLevel(int level) {
-        System.out.println("JUMPING TO LEVEL: " + level);
         LEVEL = level;
         createLevel(LEVEL);
     }
 
     private void restartLevel() {
         LIVES_LEFT = LIVES_AT_LEVEL_START;
-        System.out.println("RESTARTING LEVEL!!");
         createBricks();
         Bouncer.clearBouncers(bouncerGroup);
         createBouncer();
-    }
-
-    private void displayLives() {
-        System.out.println("LIVES: " + LIVES_LEFT);
     }
 
     private void gameOver() {
@@ -286,7 +287,6 @@ public class Game extends Application {
             spaceKeyPress();
         } else if (code == KeyCode.L) {
             LIVES_LEFT ++;
-            displayLives();
         } else if (code == KeyCode.R) {
             restartLevel();
         } else if (code == KeyCode.S) {
@@ -296,7 +296,8 @@ public class Game extends Application {
         } else if (code == KeyCode.A) {
             myPaddle.speedPaddle();
         } else if (code == KeyCode.Q) {
-            scanRoot(brickGroup);
+            System.out.println("LIVES: " + LIVES_LEFT);
+            // scanRoot(brickGroup);
         } else if (code == KeyCode.DIGIT2) {
             jumpToLevel(2);
         } else if (code == KeyCode.DIGIT3) {
@@ -305,6 +306,9 @@ public class Game extends Application {
             jumpToLevel(4);
         } else if (code == KeyCode.DIGIT5) {
             jumpToLevel(5);
+        } else if (code == KeyCode.ENTER) {
+            mySplash.toggleSplash();
+            jumpToLevel(LEVEL);
         }
     }
 

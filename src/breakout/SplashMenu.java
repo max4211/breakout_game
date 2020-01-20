@@ -10,36 +10,38 @@ import java.awt.*;
 
 public class SplashMenu extends Text{
 
-    private static String MESSAGE = "Welcome to breakout! \nRules coming sooon...";
+    private static String MESSAGE = "Welcome to breakout! " +
+            "\nHit the bouncer around to destroy bricks" +
+            "\nMove the paddle with left/right arrows" +
+            "\nEarn points as bricks are destroyed" +
+            "\nYou have three lives" +
+            "\nGood luck!" +
+            "\n(Press enter to continue)";
     private boolean SHOW_SPLASH = true;
-    // private static final Paint SPLASH_BACKGROUND = Color.WHITE;
 
     public SplashMenu(int width, int height) {
         super(width, height, MESSAGE);
-        // this.setFill(Color.WHITE);
         this.setText(MESSAGE);
         // this.setTextAlignment(TextAlignment.CENTER);
-        this.setX(width/4);
-        this.setY(height/2);
-        this.setFont(Font.font(15));
+        this.setX(width/16);
+        this.setY(height/16);
+        this.setFont(Font.font(16));
     }
 
     private void updateSplash() {
         if (this.SHOW_SPLASH) {
-            this.setText(MESSAGE);
+            showSplash();
         } else {
-
+            clearSplash();
         }
     }
 
     private void showSplash() {
         this.setText(MESSAGE);
-        // this.setFill(SPLASH_BACKGROUND);
     }
 
     private void clearSplash() {
         this.setText("");
-        this.setFill(Color.TRANSPARENT);
     }
 
     public void toggleSplash() {

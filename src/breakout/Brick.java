@@ -21,6 +21,7 @@ public class Brick extends Rectangle {
 
     // dynamic variables to update based on brick collisions
     private int BRICK_POWER = 1;
+    private int BRICK_ORIGINAL_POWER;
     private static Map<Integer, javafx.scene.paint.Paint> BRICK_COLORS;
 
     // Brick metadata read from file
@@ -49,6 +50,7 @@ public class Brick extends Rectangle {
         this.setStrokeWidth(this.getWidth() * BRICK_STROKE_WIDTH);
         this.setStroke(Color.BLACK);
         this.BRICK_POWER = power;
+        this.BRICK_ORIGINAL_POWER = power;
         updateBrickColor();
     }
 
