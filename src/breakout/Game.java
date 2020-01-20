@@ -141,7 +141,7 @@ public class Game extends Application {
     }
 
     private void createAllWalls() {
-        for (Wall w: Wall.createAllWalls(SCREEN_HEIGHT, SCREEN_WIDTH)) {wallGroup.getChildren().add(w);}
+        for (Wall w: Wall.createAllWalls(SCREEN_WIDTH, SCREEN_HEIGHT)) {wallGroup.getChildren().add(w);}
     }
 
     private void createBouncer() {

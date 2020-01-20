@@ -6,14 +6,13 @@
 - Update level
 
 #### Next steps
-- Fix theta adjustments
-- Verify wall collisions (adjust screen dimensions)
-- Fix paddle collisions
-- Refactor brick code from game class
-- Incorporate UI View for prints
-- Add power ups
-    - multiple bouncers
 - Add splash menu
+    - UI View for prints
+- Multiple bouncers cheat key
+- Refactor all public methods
+- Refactor general code
+- Comment all methods and classes (JAVADOC)
+- Add power ups
 
 #### Ideas to think about
 
