@@ -9,7 +9,7 @@ public class DisplayMenu extends Text {
 
     private int myData;
     private String myLabel;
-    private static final int FONT_SIZE = 12;
+    private static final int FONT_SIZE = 16;
 
     public DisplayMenu(int width, int height, int heightOffset, double widthOffset, int data, String label) {
         super(width, height, label);

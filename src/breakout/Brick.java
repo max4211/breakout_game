@@ -77,6 +77,10 @@ public class Brick extends Rectangle {
         }
     }
 
+    public int getOriginalPower() {
+        return BRICK_ORIGINAL_POWER;
+    }
+
     public static Collection<Brick> createAllBricks(double[] wallBounds, double paddleBound, String brickFieldText) {
         Collection<Brick> allBricks = new CopyOnWriteArrayList<>();
         int brickRow = 0;

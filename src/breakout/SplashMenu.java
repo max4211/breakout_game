@@ -36,6 +36,10 @@ public class SplashMenu extends Text{
         }
     }
 
+    private void changeSplashText(String text) {
+        this.setText(text);
+    }
+
     private void showSplash() {
         this.setText(MESSAGE);
     }

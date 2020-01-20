@@ -26,9 +26,9 @@ public class Game extends Application {
     private static final int DISPLAY_HEIGHT = 50;
     private int LIVES_LEFT = 3;
     private int LIVES_AT_LEVEL_START;
-    private int POINTS_SCORED = 0;
+    private static int POINTS_SCORED = 0;
     private int LEVEL = 1;
-    private int MAX_LEVEL = 4;
+    private int MAX_LEVEL = 2;
 
     // Game play metadata
     private static final int FRAMES_PER_SECOND = 120;
@@ -119,6 +119,10 @@ public class Game extends Application {
     public static void removeNodes(Collection<Node> destroyMe, Group group) {
         if (!destroyMe.isEmpty()) {
             for (Node n: destroyMe) {
+                if (n instanceof Brick) {
+                    Brick k = (Brick) n;
+                    POINTS_SCORED += k.getOriginalPower();
+                }
                 group.getChildren().remove(n);
             }
         }
@@ -147,7 +151,7 @@ public class Game extends Application {
     private void createDisplay() {
         displayGroup.getChildren().add(new DisplayMenu(SCREEN_WIDTH, SCREEN_HEIGHT, 10, 0.05, LIVES_LEFT, "LIVES"));
         displayGroup.getChildren().add(new DisplayMenu(SCREEN_WIDTH, SCREEN_HEIGHT, 10, 0.4, LEVEL, "LEVEL"));
-        displayGroup.getChildren().add(new DisplayMenu(SCREEN_WIDTH, SCREEN_HEIGHT, 10, 0.8, POINTS_SCORED, "POINTS"));
+        displayGroup.getChildren().add(new DisplayMenu(SCREEN_WIDTH, SCREEN_HEIGHT, 10, 0.75, POINTS_SCORED, "POINTS"));
     }
 
     private void createPaddle() {
@@ -212,10 +216,11 @@ public class Game extends Application {
             LEVEL ++;
             if (LEVEL > MAX_LEVEL) {
                 gameWin();
+            } else {
+                Bouncer.clearBouncers(bouncerGroup);
+                createBricks();
+                createBouncer();
             }
-            Bouncer.clearBouncers(bouncerGroup);
-            createBricks();
-            createBouncer();
         }
     }
 
@@ -228,14 +233,14 @@ public class Game extends Application {
         }
     }
 
-    private void createLevel(int level) {
+    private void createLevel() {
         createBricks();
         createBouncer();
     }
 
     private void jumpToLevel(int level) {
         LEVEL = level;
-        createLevel(LEVEL);
+        createLevel();
     }
 
     private void restartLevel() {
@@ -246,13 +251,15 @@ public class Game extends Application {
     }
 
     private void gameOver() {
-        System.out.println("GAME OVER!!");
-        System.exit(0);
+        mySplash.toggleSplash();
+        mySplash.setText("GAME OVER!!");
+        // System.exit(0);
     }
 
     private void gameWin() {
-        System.out.println("GAME WIN!!");
-        System.exit(0);
+        mySplash.toggleSplash();
+        mySplash.setText("GAME WIN!!");
+        // System.exit(0);
     }
 
     private void sideKeyPress(int direct) {
@@ -296,8 +303,7 @@ public class Game extends Application {
         } else if (code == KeyCode.A) {
             myPaddle.speedPaddle();
         } else if (code == KeyCode.Q) {
-            System.out.println("LIVES: " + LIVES_LEFT);
-            // scanRoot(brickGroup);
+            // Debug code
         } else if (code == KeyCode.DIGIT2) {
             jumpToLevel(2);
         } else if (code == KeyCode.DIGIT3) {
