@@ -22,7 +22,8 @@ public class Game extends Application {
     // Game metadata
     private static final String TITLE = "Breakout Game JavaFX";
     private static final int SCREEN_WIDTH = 400;
-    private static final int SCREEN_HEIGHT = 400;
+    private static final int SCREEN_HEIGHT = 500;
+    private static final int DISPLAY_HEIGHT = 100;
     private int LIVES_LEFT = 3;
     private int LIVES_AT_LEVEL_START;
     private int POINTS_SCORED = 0;
@@ -41,12 +42,13 @@ public class Game extends Application {
     // some things needed to remember during the game
     private Scene myScene;
     private Paddle myPaddle;
+    private SplashMenu mySplash;
 
     // TODO: Updating elements to become groups
     private Group wallGroup = new Group();
     private Group bouncerGroup = new Group();
     private Group brickGroup = new Group();
-    private Group textGroup = new Group();
+    private Group displayGroup = new Group();
     private Group powerGroup = new Group();
 
     /**
@@ -59,7 +61,6 @@ public class Game extends Application {
         stage.setScene(myScene);
         stage.setTitle(TITLE);
         stage.show();
-        // attach "game loop" to timeline to play it (basically just calling step() method repeatedly forever)
         KeyFrame frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY), e -> step(SECOND_DELAY));
         Timeline animation = new Timeline();
         animation.setCycleCount(Timeline.INDEFINITE);
@@ -67,35 +68,29 @@ public class Game extends Application {
         animation.play();
     }
 
-    // Create the game's "scene": what shapes will be in the game and their starting properties
     private Scene setupGame () {
-        // create one top level collection to organize the things in the scene
         Group root = new Group();
-
-        // make some shapes and set their properties
         root = initializeRoot(root);
-
-        // create a place to see the shapes and respond to input
-        Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT, BACKGROUND);
-        // Scene scene = new Scene(root);
+        Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT + DISPLAY_HEIGHT, BACKGROUND);
         scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
         return scene;
     }
 
     private Group initializeRoot(Group root) {
+        createSplash();
         createPaddle();
         createAllWalls();
         createBouncer();
         createBricks();
 
+        root = addSplashToRoot(root);
         root = addPaddleToRoot(root);
         root = addToRoot(root, wallGroup);
         root = addToRoot(root, bouncerGroup);
         root = addToRoot(root, brickGroup);
 
         ((Bouncer) bouncerGroup.getChildren().get(0)).stickBouncerOnPaddle(myPaddle);
-        // scanRoot(root);
-
+        scanRoot(root);
         return root;
     }
 
@@ -108,14 +103,15 @@ public class Game extends Application {
         }
     }
 
-    // Change properties of shapes in small ways to animate them over time
+    // Play game while splash is not dispalyed
     private void step(double elapsedTime) {
-        // update "actors" attributes
-        moveBouncer(elapsedTime, bouncerGroup);
-        Collision.collisionDetection(bouncerGroup, brickGroup,  wallGroup, myPaddle);
-        outOfBoundsDetection();
-        checkBouncersLeft();
-        checkLevelClear();
+        if (!mySplash.isShowing()) {
+            moveBouncer(elapsedTime);
+            Collision.collisionDetection(bouncerGroup, brickGroup,  wallGroup, myPaddle);
+            outOfBoundsDetection();
+            checkBouncersLeft();
+            checkLevelClear();
+        }
     }
 
     public static void removeNodes(Collection<Node> destroyMe, Group group) {
@@ -131,9 +127,18 @@ public class Game extends Application {
         return root;
     }
 
+    private Group addSplashToRoot(Group root) {
+        root.getChildren().add(mySplash);
+        return root;
+    }
+
     private Group addPaddleToRoot(Group root) {
         root.getChildren().add(myPaddle);
         return root;
+    }
+
+    private void createSplash() {
+        mySplash = new SplashMenu(SCREEN_WIDTH, SCREEN_HEIGHT);
     }
 
     private void createPaddle() {
@@ -207,7 +212,7 @@ public class Game extends Application {
         }
     }
 
-    private void moveBouncer(double elapsedTime, Group group) {
+    private void moveBouncer(double elapsedTime) {
         for (Node n: bouncerGroup.getChildren()) {
             if (n instanceof Bouncer) {
                 Bouncer b = (Bouncer) n;
@@ -290,17 +295,17 @@ public class Game extends Application {
             myPaddle.extend();
         } else if (code == KeyCode.A) {
             myPaddle.speedPaddle();
-        }
-        // TODO: Implement level skip
-        /*
-        else if (code == KeyCode.DIGIT2) {
+        } else if (code == KeyCode.Q) {
+            scanRoot(brickGroup);
+        } else if (code == KeyCode.DIGIT2) {
             jumpToLevel(2);
         } else if (code == KeyCode.DIGIT3) {
             jumpToLevel(3);
         } else if (code == KeyCode.DIGIT4) {
             jumpToLevel(4);
+        } else if (code == KeyCode.DIGIT5) {
+            jumpToLevel(5);
         }
-         */
     }
 
     public static void main (String[] args) {

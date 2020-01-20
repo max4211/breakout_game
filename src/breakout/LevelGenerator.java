@@ -17,6 +17,10 @@ public class LevelGenerator {
     private static final int ROWS_OF_BRICKS = 6;
     private static String SEPARATOR = " ";
 
+    // private static final String LEVEL_STYLE = "Random";
+    private static final String LEVEL_STYLE = "Constant";
+
+
     public LevelGenerator(int level) throws IOException {
         LEVEL = level;
         createLevel(LEVEL);
@@ -51,7 +55,14 @@ public class LevelGenerator {
     }
 
     private static String assignBrick() {
-        return Integer.toString((int)(Math.random() * LEVEL + 1));
+        String s = "";
+        if (LEVEL_STYLE.equals("Random")) {
+            s = Integer.toString((int)(Math.random() * LEVEL + 1));
+        } else if (LEVEL_STYLE.equals("Constant")) {
+            s = Integer.toString(LEVEL);
+        }
+        return s;
+
     }
 
     private static boolean clearVerticalPad(int i) {
