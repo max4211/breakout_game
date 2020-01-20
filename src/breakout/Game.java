@@ -43,8 +43,7 @@ public class Game extends Application {
     private Scene myScene;
     private Paddle myPaddle;
     private SplashMenu mySplash;
-
-    // TODO: Updating elements to become groups
+    
     private Group wallGroup = new Group();
     private Group bouncerGroup = new Group();
     private Group brickGroup = new Group();

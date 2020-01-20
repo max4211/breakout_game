@@ -47,7 +47,8 @@ Extra credit:
 - Level generation class, trivial adjustment to play infinitely
 
 ### Notes/Assumptions
-Assumed that design was more important than functionality.
+- Assumed that design was more important than functionality.
+- Assumed that scenes were the best base jfx node (in hindsight, panes might have been better).
 
 ### Impressions
-Challenging and rewarding first project.
+- Challenging and rewarding first project.
