@@ -1,17 +1,11 @@
 # TODO
 ## Max Smith
 
-#### Changes to make
-- Make global sizing variables dynamic to game screen
-- Update level
-
 #### Next steps
 - Refactor all public methods
 - Refactor general code
 - Comment all methods and classes (JAVADOC)
-- Add power ups
-
-#### Ideas to think about
+- Write up FOLDER_PURPOSE.md doc? (check piazza)
 
 #### Design decisions
 - All objects extend shape classes
