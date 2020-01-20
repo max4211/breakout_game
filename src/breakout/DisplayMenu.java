@@ -27,7 +27,7 @@ public class DisplayMenu extends Text {
 
     private void updateData(int data) {
         this.myData = data;
-        updateDisplay();
+        this.updateDisplay();
     }
 
     private void updateDisplay() {
@@ -39,11 +39,11 @@ public class DisplayMenu extends Text {
         for (Node n: displayGroup.getChildren()) {
             if (n instanceof DisplayMenu) {
                 DisplayMenu dm = (DisplayMenu) n;
-                if (dm.getLabel().equals("LIVES_LEFT")) {
+                if (dm.getLabel().equals("LIVES")) {
                     data = LIVES_LEFT;
                 } else if (dm.getLabel().equals("LEVEL")) {
                     data = LEVEL;
-                } else if (dm.getLabel().equals("POINTS_SCORED")) {
+                } else if (dm.getLabel().equals("POINTS")) {
                     data = POINTS_SCORED;
                 }
                 dm.updateData(data);
