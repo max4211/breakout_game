@@ -13,7 +13,7 @@ public class LevelGenerator {
     private static final int BOTTOM_PAD = 1;
 
     // Vars private to this class
-    private static final int BRICKS_PER_ROW = 6;
+    private static final int BRICKS_PER_ROW = 7;
     private static final int ROWS_OF_BRICKS = 3;
     private static String SEPARATOR = " ";
 

@@ -6,9 +6,6 @@
 - Update level
 
 #### Next steps
-- Add splash menu
-    - UI View for prints
-- Multiple bouncers cheat key
 - Refactor all public methods
 - Refactor general code
 - Comment all methods and classes (JAVADOC)
