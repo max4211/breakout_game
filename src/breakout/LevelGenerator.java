@@ -16,7 +16,6 @@ public class LevelGenerator {
 
     // Vars visible to external devices
     private int LEVEL;
-    private int MAX_LEVEL = 20;
     private final int SIDE_PAD = 1;     // maintain less than 1/2 of BRICKS_PER_ROW
     private final int TOP_PAD = 0;
     private final int BOTTOM_PAD = 1;
@@ -65,7 +64,6 @@ public class LevelGenerator {
                 }
                 printInt(brick, writer, false);
             }
-            // System.out.println();
             writer.println();
         }
         writer.close();
@@ -79,7 +77,6 @@ public class LevelGenerator {
             s = Integer.toString(LEVEL);
         }
         return s;
-
     }
 
     private boolean clearVerticalPad(int i) {
@@ -90,24 +87,12 @@ public class LevelGenerator {
         return (localPad > SIDE_PAD) && (localPad <= (BRICKS_PER_ROW - SIDE_PAD)) && (vertPad);
     }
 
-    private void generateLevels() throws IOException {
-        for (int i = 1; i <=  MAX_LEVEL; i ++) {
-            createLevel(i);
-        }
-    }
-
     private void printInt(String s, PrintWriter w, boolean newLine) {
         if (newLine) {
-            // System.out.println(s);
             w.println(s);
         } else {
-            // System.out.print(s + SEPARATOR);
             w.print(s + SEPARATOR);
         }
-    }
-
-    public void main(String[] args) throws IOException {
-        generateLevels();
     }
 
 }
