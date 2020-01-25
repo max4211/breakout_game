@@ -64,7 +64,7 @@ public class Game extends Application {
         stage.setScene(myScene);
         stage.setTitle(TITLE);
         stage.show();
-        KeyFrame frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY), e -> step(SECOND_DELAY));
+        KeyFrame frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY), e -> step());
         Timeline animation = new Timeline();
         animation.setCycleCount(Timeline.INDEFINITE);
         animation.getKeyFrames().add(frame);
@@ -108,10 +108,10 @@ public class Game extends Application {
     }
 
     // Play game while splash is not dispalyed
-    private void step(double elapsedTime) {
+    private void step() {
         DisplayMenu.updateFullDisplay(displayGroup, LIVES_LEFT, LEVEL, POINTS_SCORED);
         if (!mySplash.isShowing()) {
-            moveBouncer(elapsedTime);
+            moveBouncer(Game.SECOND_DELAY);
             Collision.collisionDetection(bouncerGroup, brickGroup,  wallGroup, myPaddle);
             checkOutOfBounds();
             checkBouncersLeft();
@@ -227,9 +227,7 @@ public class Game extends Application {
             if (LEVEL > MAX_LEVEL) {
                 gameWin();
             } else {
-                Bouncer.clearBouncers(bouncerGroup);
-                createBricks();
-                createBouncer();
+                createLevel();
             }
         }
     }
@@ -249,6 +247,7 @@ public class Game extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Bouncer.clearBouncers(bouncerGroup);
         createBricks();
         createBouncer();
     }
@@ -263,9 +262,7 @@ public class Game extends Application {
 
     private void restartLevel() {
         LIVES_LEFT = LIVES_AT_LEVEL_START;
-        createBricks();
-        Bouncer.clearBouncers(bouncerGroup);
-        createBouncer();
+        createLevel();
     }
 
     private void gameOver() {
