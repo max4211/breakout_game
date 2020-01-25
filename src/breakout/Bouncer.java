@@ -113,10 +113,6 @@ public class Bouncer extends Circle {
         return BOUNCER_DAMAGE;
     }
 
-    public static void clearBouncers(Group bouncerGroup) {
-        bouncerGroup.getChildren().clear();
-    }
-
     public void catchBall() {
         this.BOUNCER_SPEED = 0;
         this.BOUNCER_STUCK = true;

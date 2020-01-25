@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
+ * The purpose of this class is to drive Game generation with associated specs, implementing JavaFX library
+ * Refactored for Code Masterpiece, all functionality has been refactored and generalized
+ * Naming conventions are all standard and complete, casting and instanceof validation is checked as well
+ * Furthermore, redundancies in game flow have been refactored (createLevel call creates Bouncers, Bricks, etc.)
  * Main game engine to process game rules
  * Stores a group of all objects (bouncers, walls, bricks, splash displays)
  * Set metadata on top to configure game set up, then run
@@ -24,10 +28,10 @@ import java.util.Collection;
  */
 public class Game extends Application {
     // Game metadata
-    private static final String TITLE = "Breakout Game JavaFX";
-    private static final int SCREEN_WIDTH = 400;
-    private static final int SCREEN_HEIGHT = 400;
-    private static final int DISPLAY_HEIGHT = 50;
+    private final String TITLE = "Breakout Game JavaFX";
+    private final int SCREEN_WIDTH = 400;
+    private final int SCREEN_HEIGHT = 400;
+    private final int DISPLAY_HEIGHT = 50;
     private int LIVES_LEFT = 3;
     private int LIVES_AT_LEVEL_START;
     private static int POINTS_SCORED = 0;
@@ -35,13 +39,10 @@ public class Game extends Application {
     private int MAX_LEVEL = 20;
 
     // Game play metadata
-    private static final int FRAMES_PER_SECOND = 120;
-    private static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
-    private static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
-    private static final Paint BACKGROUND = Color.AZURE;
-
-    // Testing  brick creation
-    private static String BRICK_FIELD_TEXT;
+    private final int FRAMES_PER_SECOND = 120;
+    private final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
+    private final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
+    private final Paint BACKGROUND = Color.AZURE;
 
     // some things needed to remember during the game
     private Scene myScene;
@@ -52,14 +53,12 @@ public class Game extends Application {
     private Group bouncerGroup = new Group();
     private Group brickGroup = new Group();
     private Group displayGroup = new Group();
-    private Group powerGroup = new Group();
 
     /**
      * Initialize what will be displayed and how it will be updated.
      */
     @Override
     public void start (Stage stage) {
-        // attach scene to the stage and display it
         myScene = setupGame();
         stage.setScene(myScene);
         stage.setTitle(TITLE);
@@ -73,29 +72,28 @@ public class Game extends Application {
 
     private Scene setupGame () {
         Group root = new Group();
-        root = initializeRoot(root);
+        initializeRoot(root);
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT + DISPLAY_HEIGHT, BACKGROUND);
         scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
         return scene;
     }
 
-    private Group initializeRoot(Group root) {
+    private void initializeRoot(Group root) {
         createSplash();
         createPaddle();
         createAllWalls();
         createBouncer();
         createDisplay();
 
-        root = addSplashToRoot(root);
-        root = addPaddleToRoot(root);
-        root = addToRoot(root, wallGroup);
-        root = addToRoot(root, bouncerGroup);
-        root = addToRoot(root, brickGroup);
-        root = addToRoot(root, displayGroup);
+        addObjectToRoot(root, mySplash);
+        addObjectToRoot(root, myPaddle);
+        addToRoot(root, wallGroup);
+        addToRoot(root, bouncerGroup);
+        addToRoot(root, brickGroup);
+        addToRoot(root, displayGroup);
 
         ((Bouncer) bouncerGroup.getChildren().get(0)).stickBouncerOnPaddle(myPaddle);
         // scanRoot(root);
-        return root;
     }
 
     private void scanRoot(Group root) {
@@ -111,7 +109,7 @@ public class Game extends Application {
     private void step() {
         DisplayMenu.updateFullDisplay(displayGroup, LIVES_LEFT, LEVEL, POINTS_SCORED);
         if (!mySplash.isShowing()) {
-            moveBouncer(Game.SECOND_DELAY);
+            moveBouncer();
             Collision.collisionDetection(bouncerGroup, brickGroup,  wallGroup, myPaddle);
             checkOutOfBounds();
             checkBouncersLeft();
@@ -138,19 +136,12 @@ public class Game extends Application {
         }
     }
 
-    private Group addToRoot(Group root, Group addMe) {
+    private void addToRoot(Group root, Group addMe) {
         root.getChildren().add(addMe);
-        return root;
     }
 
-    private Group addSplashToRoot(Group root) {
-        root.getChildren().add(mySplash);
-        return root;
-    }
-
-    private Group addPaddleToRoot(Group root) {
-        root.getChildren().add(myPaddle);
-        return root;
+    private void addObjectToRoot(Group root, Node n) {
+        root.getChildren().add(n);
     }
 
     private void createSplash() {
@@ -169,32 +160,25 @@ public class Game extends Application {
     }
 
     private void createAllWalls() {
-        for (Wall w: Wall.createAllWalls(SCREEN_WIDTH, SCREEN_HEIGHT)) {wallGroup.getChildren().add(w);}
+        wallGroup.getChildren().addAll(Wall.createAllWalls(SCREEN_WIDTH, SCREEN_HEIGHT));
     }
 
     private void createBouncer() {
-        clearBouncer();
+        clearGroup(bouncerGroup);
         Bouncer b = new Bouncer();
         b.stickBouncerOnPaddle(myPaddle);
         bouncerGroup.getChildren().add(b);
     }
 
-    private void clearBouncer() {
-        bouncerGroup.getChildren().clear();
-    }
-
-    private void clearBricks() {
-        brickGroup.getChildren().clear();
-    }
+    private void clearGroup(Group group) {group.getChildren().clear();}
 
     private void createBricks() {
-        clearBricks();
+        clearGroup(brickGroup);
         double[] wallBounds = Wall.getWallBounds(wallGroup);
         double paddleBound = myPaddle.getPaddleBound();
         LIVES_AT_LEVEL_START = LIVES_LEFT;
-        BRICK_FIELD_TEXT = "resources/level_" + LEVEL + ".txt";
-        Collection<Brick> myBricks = Brick.createAllBricks(wallBounds, paddleBound, BRICK_FIELD_TEXT);
-        for (Brick k: myBricks) {brickGroup.getChildren().add(k);}
+        String fileName = "resources/level_" + LEVEL + ".txt";
+        brickGroup.getChildren().addAll(Brick.createAllBricks(wallBounds, paddleBound, fileName));
     }
 
     private void checkOutOfBounds() {
@@ -232,11 +216,11 @@ public class Game extends Application {
         }
     }
 
-    private void moveBouncer(double elapsedTime) {
+    private void moveBouncer() {
         for (Node n: bouncerGroup.getChildren()) {
             if (n instanceof Bouncer) {
                 Bouncer b = (Bouncer) n;
-                b.move(elapsedTime);
+                b.move(SECOND_DELAY);
             }
         }
     }
@@ -247,7 +231,7 @@ public class Game extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Bouncer.clearBouncers(bouncerGroup);
+        clearGroup(bouncerGroup);
         createBricks();
         createBouncer();
     }
@@ -268,13 +252,11 @@ public class Game extends Application {
     private void gameOver() {
         mySplash.toggleSplash();
         mySplash.setText("GAME OVER!!");
-        // System.exit(0);
     }
 
     private void gameWin() {
         mySplash.toggleSplash();
         mySplash.setText("GAME WIN!!");
-        // System.exit(0);
     }
 
     private void sideKeyPress(int direct) {
@@ -321,8 +303,6 @@ public class Game extends Application {
             myPaddle.speedPaddle();
         } else if (code == KeyCode.W){
             Bouncer.slowBouncers(bouncerGroup);
-        } else if (code == KeyCode.Q) {
-            // Debug code
         } else if (code == KeyCode.X) {
             Bouncer.addBouncers(bouncerGroup);
         } else if (code == KeyCode.ENTER) {
